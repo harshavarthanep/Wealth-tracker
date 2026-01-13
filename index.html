@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMA Companion | Ultimate Study Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <style>
+        :root {
+            /* Default Theme (Deep Focus - Navy) */
+            --bg-main: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --accent-primary: #fbbf24; /* Gold */
+            --border-color: rgba(255, 255, 255, 0.08);
+            --bg-image: radial-gradient(circle at top right, rgba(255,255,255,0.03), transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(255,255,255,0.03), transparent 40%);
+        }
+
+        /* --- STUDY THEMES --- */
+
+        /* Night Owl (Midnight) */
+        [data-theme="midnight"] { 
+            --bg-main: #000000; 
+            --bg-card: rgba(20, 20, 20, 0.85); 
+            --accent-primary: #e2e8f0; 
+            --bg-image: none;
+        }
+
+        /* Espresso Flow (Coffee) */
+        [data-theme="coffee"] { 
+            --bg-main: #271c19; 
+            --bg-card: rgba(60, 42, 33, 0.85); 
+            --accent-primary: #d4a373; 
+            --bg-image: linear-gradient(to bottom, #271c19, #1a1210);
+        }
+
+        /* Cyber Sprint (Cyberpunk) */
+        [data-theme="cyberpunk"] { 
+            --bg-main: #09090b; 
+            --bg-card: rgba(24, 24, 27, 0.9); 
+            --accent-primary: #22d3ee; 
+            --bg-image: repeating-linear-gradient(45deg, #09090b 25%, transparent 25%, transparent 75%, #09090b 75%, #09090b), 
+                        repeating-linear-gradient(45deg, #09090b 25%, #09090b 25%, #09090b 75%, #09090b 75%, #09090b);
+        }
+
+        /* --- OS INSPIRED THEMES --- */
+
+        /* Crystal Clarity (iOS 16 Glass - Refined) */
+        [data-theme="glass"] { 
+            --bg-main: #000000;
+            --bg-card: rgba(255, 255, 255, 0.08); 
+            --accent-primary: #e0e7ff; 
+            --bg-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                        radial-gradient(at 50% 0%, hsla(225,39%,10%,1) 0, transparent 50%), 
+                        radial-gradient(at 100% 0%, hsla(339,20%,10%,1) 0, transparent 50%);
+            --border-color: rgba(255, 255, 255, 0.12);
+        }
+        [data-theme="glass"] .glass-panel {
+            backdrop-filter: blur(40px) saturate(140%);
+            -webkit-backdrop-filter: blur(40px) saturate(140%);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* OneUI (Samsung Style - AMOLED) */
+        [data-theme="oneui"] {
+            --bg-main: #000000;
+            --bg-card: #1c1c1e; /* Deep gray, not transparent */
+            --accent-primary: #a78bfa; /* Soft Violet */
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border-color: #2c2c2e;
+            --bg-image: none;
+        }
+        [data-theme="oneui"] .glass-panel {
+            border-radius: 24px; /* More rounded */
+            backdrop-filter: none;
+            box-shadow: none;
+        }
+        [data-theme="oneui"] button {
+            border-radius: 999px; /* Pill shapes */
+        }
+
+        /* Oxygen (OnePlus Style - Zen Mode) */
+        [data-theme="oxygen"] {
+            --bg-main: #1f1f1f;
+            --bg-card: #282828;
+            --accent-primary: #f87171; /* Oxygen Red/Pink */
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255,255,255,0.05);
+            --bg-image: linear-gradient(to bottom right, #1f1f1f 50%, #2a2a2a 100%);
+        }
+
+        /* Windows 11 (Mica/Bloom) */
+        [data-theme="windows"] {
+            --bg-main: #202020;
+            --bg-card: rgba(255, 255, 255, 0.04); /* Mica effect simulation */
+            --accent-primary: #60cdff; /* Win 11 Blue */
+            --text-main: #ffffff;
+            --border-color: rgba(255,255,255,0.08);
+            /* Abstract Bloom Background */
+            --bg-image: radial-gradient(circle at 50% 10%, rgba(96, 205, 255, 0.15), transparent 60%),
+                        radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.15), transparent 50%);
+        }
+
+
+        /* --- BASE STYLES --- */
+        body {
+            background-color: var(--bg-main);
+            background-image: var(--bg-image);
+            background-attachment: fixed;
+            background-size: cover;
+            color: var(--text-main);
+            transition: background 0.5s ease;
+        }
+
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* --- SATISFYING ANIMATIONS --- */
+        
+        /* Buttons: Press effect & brightness */
+        button {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: scale(0.95) translateY(0);
+            filter: brightness(0.9);
+        }
+
+        /* Widgets: Hover Lift (Optimized - Subtle) */
+        .draggable-item { 
+            cursor: grab; 
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .draggable-item:hover {
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 24px -6px rgba(0,0,0,0.4); 
+            border-color: rgba(255,255,255,0.15);
+        }
+        .draggable-item:active { 
+            cursor: grabbing; 
+            transform: scale(0.99);
+        }
+
+        /* Inputs: Focus Glow */
+        input, textarea, select {
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+        input:focus, textarea:focus {
+            transform: scale(1.005);
+            background: rgba(0,0,0,0.4);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+        }
+
+        /* Checkbox Animation */
+        input[type="checkbox"] {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        input[type="checkbox"]:checked {
+            transform: scale(1.1);
+        }
+
+        /* List Items Slide In */
+        .list-item-enter {
+            animation: slideIn 0.3s ease forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Premium Emoji Icon Styles */
+        .premium-icon {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--accent-primary);
+            box-shadow: 0 0 15px -8px var(--accent-primary);
+            color: #fff; /* Ensure visibility on all backgrounds */
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        
+        /* Updated: Subtle Premium Pop */
+        .icon-pop {
+            animation: iconPop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes iconPop {
+            0% { transform: scale(0.95); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.2); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        /* Theme Menu Active State */
+        .theme-active {
+            background: rgba(255,255,255,0.15) !important;
+            font-weight: bold;
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        /* --- EXISTING STYLES --- */
+        .drop-zone { min-height: 150px; border-radius: 1rem; transition: background 0.3s; }
+        .drop-zone.drag-over { background: rgba(255,255,255,0.05); border: 2px dashed var(--accent-primary); transform: scale(1.01); }
+
+        /* Animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        
+        .modal { transition: opacity 0.2s ease-in-out; opacity: 0; pointer-events: none; backdrop-filter: blur(5px); }
+        .modal.active { opacity: 1; pointer-events: auto; }
+
+        .gold-gradient-text {
+            background: linear-gradient(to right, var(--accent-primary), #fff, var(--accent-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Sidebar Store */
+        .widget-sidebar {
+            position: fixed; right: -320px; top: 0; width: 300px; height: 100%;
+            background: var(--bg-card); backdrop-filter: blur(20px); z-index: 100;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid var(--border-color);
+            padding: 20px; overflow-y: auto;
+        }
+        .widget-sidebar.open { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+
+        /* Breathing Animation */
+        .breathing-circle {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--accent-primary);
+            opacity: 0.2; transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+        .breathing-active { animation: breathe 16s infinite ease-in-out; }
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.5); opacity: 0.2; }
+            25% { transform: scale(1.2); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            75% { transform: scale(0.5); opacity: 0.2; }
+        }
+        
+        /* Blinking Water Alert */
+        .water-blink { animation: pulse-gold 2s infinite; }
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+        }
+
+        /* Utilities */
+        .accent-text { color: var(--accent-primary); }
+        .accent-bg { background-color: var(--accent-primary); color: #0f172a; }
+        .accent-border { border-color: var(--accent-primary); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cma: { gold: 'var(--accent-primary)', muted: 'var(--text-muted)' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Toast & Overlay -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[110] space-y-2 pointer-events-none"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <!-- WIDGET SIDEBAR -->
+    <div id="widget-sidebar" class="widget-sidebar shadow-2xl">
+        <div class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+            <h2 class="text-xl font-bold font-serif accent-text">Widgets</h2>
+            <button onclick="toggleSidebar()" class="text-gray-400 hover:text-white p-2 rounded-full hover:bg-white/10"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        <div id="sidebar-list" class="space-y-4">
+            <!-- Inactive widgets appear here -->
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Welcome -->
+    <div id="welcome-modal" class="modal fixed inset-0 z-[120] flex items-center justify-center bg-black/90 backdrop-blur-md">
+        <div class="glass-panel p-8 rounded-2xl w-full max-w-md mx-4 text-center border-t-2 border-b-2 accent-border">
+            <div class="mb-4 text-5xl accent-text animate-bounce"><i class="fa-solid fa-graduation-cap"></i></div>
+            <h2 class="text-3xl font-serif font-bold text-white mb-2">Welcome, Future CMA!</h2>
+            <p class="text-cma-muted mb-6">Let's personalize your study sanctuary. What should I call you?</p>
+            <input type="text" id="username-input" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 text-center text-xl text-white focus:border-white outline-none mb-6 placeholder-gray-600" placeholder="e.g. Shivani">
+            <button onclick="saveNameAndStart()" class="w-full accent-bg font-bold py-3 rounded-lg hover:opacity-90 shadow-lg shadow-yellow-500/20">Begin Journey</button>
+        </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings-modal" class="modal fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="glass-panel p-6 rounded-xl w-full max-w-sm mx-4 transform transition-all scale-100">
+            <h3 class="text-xl font-serif font-bold accent-text mb-4"><i class="fa-solid fa-clock"></i> Timer Settings</h3>
+            <div class="space-y-4">
+                <div><label class="block text-sm text-cma-muted mb-1">Study (mins)</label><input type="number" id="setting-work" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none" min="1"></div>
+                <div><label class="block text-sm text-cma-muted mb-1">Break (mins)</label><input type="number" id="setting-break" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none" min="1"></div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="toggleSettingsModal()" class="px-4 py-2 text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="saveTimerSettings()" class="px-4 py-2 accent-bg font-bold rounded text-black shadow-lg">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Confirmation -->
+    <div id="remove-modal" class="modal fixed inset-0 z-[130] flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="glass-panel p-6 rounded-xl w-full max-w-sm mx-4 text-center border border-red-500/30">
+            <i class="fa-solid fa-triangle-exclamation text-3xl text-red-400 mb-4 animate-pulse"></i>
+            <h3 class="text-lg font-bold text-white mb-2">Remove Widget?</h3>
+            <p class="text-sm text-cma-muted mb-6">It will move to the Widget Store. You can add it back later.</p>
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeRemoveModal()" class="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600 text-white">No, Keep it</button>
+                <button id="confirm-remove-btn" class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold shadow-red-900/50 shadow-lg">Yes, Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="w-full px-6 py-4 border-b border-white/10 bg-black/20 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <!-- Dynamic Emoji Container with Premium Style -->
+                <div id="dynamic-icon" onclick="changeHeaderIcon(); audio.playClick();" class="premium-icon w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl cursor-pointer select-none">
+                    🚀
+                </div>
+                <div>
+                    <h1 class="text-2xl font-serif font-bold tracking-wide flex items-center gap-2">
+                        <span>CMA</span> <span id="header-name" class="gold-gradient-text">Aspirant</span>
+                    </h1>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="bg-green-900/50 text-green-400 border border-green-800 px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span> In Progress
+                        </span>
+                        <span id="current-date" class="text-cma-muted"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Sound Toggle -->
+                <button onclick="toggleSound()" id="sound-btn" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors" title="Toggle Sound FX">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                
+                <!-- Voice Toggle -->
+                <button onclick="toggleVoice()" id="voice-btn" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors" title="Toggle Voice Coach">
+                    <i class="fa-solid fa-headset"></i>
+                </button>
+
+                <!-- Clickable Theme Menu -->
+                <div class="relative">
+                    <button onclick="toggleThemeMenu(event); audio.playClick();" class="text-cma-muted hover:text-white p-2 rounded-lg hover:bg-white/5"><i class="fa-solid fa-palette"></i></button>
+                    <!-- Optimized Menu: Max height, overflow, and z-index for mobile -->
+                    <div id="theme-menu" class="absolute right-0 mt-2 w-56 glass-panel rounded-xl p-2 hidden z-[60] transform origin-top-right transition-all duration-200 max-h-[60vh] overflow-y-auto overscroll-contain">
+                        <div class="text-[10px] uppercase tracking-widest text-cma-muted px-2 py-1 mb-1">Study Mode</div>
+                        <button onclick="setTheme('default')" data-theme-id="default" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-amber-200 transition-colors flex justify-between items-center mb-1">Deep Focus</button>
+                        <button onclick="setTheme('midnight')" data-theme-id="midnight" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-gray-300 transition-colors flex justify-between items-center mb-1">Night Owl</button>
+                        <button onclick="setTheme('coffee')" data-theme-id="coffee" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-[#d4a373] transition-colors flex justify-between items-center mb-1">Espresso Flow</button>
+                        <button onclick="setTheme('cyberpunk')" data-theme-id="cyberpunk" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-[#22d3ee] transition-colors flex justify-between items-center mb-1">Cyber Sprint</button>
+                        
+                        <div class="border-t border-white/10 my-1"></div>
+                        <div class="text-[10px] uppercase tracking-widest text-cma-muted px-2 py-1 mb-1">OS Inspired</div>
+                        <button onclick="setTheme('glass')" data-theme-id="glass" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-indigo-200 transition-colors flex justify-between items-center mb-1">iOS Glass <i class="fa-brands fa-apple"></i></button>
+                        <button onclick="setTheme('oneui')" data-theme-id="oneui" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-violet-200 transition-colors flex justify-between items-center mb-1">OneUI <i class="fa-brands fa-android"></i></button>
+                        <button onclick="setTheme('oxygen')" data-theme-id="oxygen" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-red-200 transition-colors flex justify-between items-center mb-1">OxygenOS</button>
+                        <button onclick="setTheme('windows')" data-theme-id="windows" class="block w-full text-left px-3 py-3 text-xs rounded hover:bg-white/10 text-blue-200 transition-colors flex justify-between items-center">Windows 11 <i class="fa-brands fa-windows"></i></button>
+                    </div>
+                </div>
+                <!-- Add Widget Btn -->
+                <button onclick="toggleSidebar(); audio.playClick();" class="accent-bg text-xs px-3 py-1.5 rounded-full font-bold shadow-lg hover:opacity-90 flex items-center gap-2 text-black transition-transform active:scale-95">
+                    <i class="fa-solid fa-plus"></i> Widgets
+                </button>
+                <button onclick="requestNotificationPermission()" id="notif-btn" class="text-xs border border-white/20 px-3 py-1.5 rounded-full text-gray-300 hover:bg-white/10 flex items-center gap-2 transition-colors"><i class="fa-regular fa-bell"></i> Enable Alerts</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+        <!-- Quote -->
+        <div class="glass-panel rounded-2xl p-6 mb-8 relative overflow-hidden border-l-4 accent-border group">
+            <h2 class="text-lg md:text-xl font-serif italic pr-8 text-white/90 transition-opacity duration-500" id="quote-display">"Loading..."</h2>
+            <button onclick="displayRandomQuote(); audio.playClick();" class="absolute bottom-4 right-4 text-cma-muted hover:text-white transition-all hover:rotate-180 duration-500 hover:scale-110 p-2"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+
+        <!-- 2-COLUMN GRID -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left: Timer, Goals, Milestones -->
+            <div id="col-1" class="drop-zone flex flex-col gap-6 p-1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <!-- Right: Water, Calc, Notes -->
+            <div id="col-2" class="drop-zone flex flex-col gap-6 p-1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="text-center py-6 text-cma-muted text-xs opacity-60 hover:opacity-100 transition-opacity">
+        <p>Made with <i class="fa-solid fa-heart text-red-500 mx-1 animate-pulse"></i> by Harsha Varthan E P</p>
+    </footer>
+
+    <!-- WIDGET DEFINITIONS -->
+    <div id="widget-store" class="hidden">
+        
+        <!-- 1. TIMER -->
+        <div id="widget-timer" class="draggable-item glass-panel rounded-2xl p-6 relative" draggable="true" ondragstart="drag(event)">
+            <button onclick="toggleSettingsModal(); audio.playClick();" class="absolute top-4 left-4 text-gray-500 hover:text-white p-2 rounded-full hover:bg-white/5"><i class="fa-solid fa-gear"></i></button>
+            <div class="flex justify-between mb-4 pl-8">
+                <h3 class="font-bold text-lg text-white">Focus Timer</h3>
+                <button onclick="confirmRemove('widget-timer'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex bg-black/30 rounded-lg p-1 mb-6">
+                <button onclick="manualSwitchMode(true); audio.playClick();" id="tab-work" class="flex-1 py-1.5 text-xs font-bold rounded accent-bg text-black transition-all duration-300">Study</button>
+                <button onclick="manualSwitchMode(false); audio.playClick();" id="tab-break" class="flex-1 py-1.5 text-xs font-bold rounded text-cma-muted hover:text-white transition-all duration-300">Break</button>
+            </div>
+            <div class="text-center mb-6">
+                <div class="text-6xl font-mono font-bold tabular-nums text-white transition-colors duration-300" id="timer-display">25:00</div>
+                <div id="timer-status" class="text-xs text-cma-muted mt-2">Ready?</div>
+            </div>
+            <div class="flex gap-3">
+                <button id="start-btn" onclick="toggleTimer(); audio.playClick();" class="flex-1 accent-bg font-bold py-3 rounded-lg hover:opacity-90 shadow-lg text-black transition-all active:scale-95">Start</button>
+                <button onclick="resetTimer(); audio.playClick();" class="px-4 rounded-lg border border-gray-600 hover:bg-gray-700 text-gray-300 transition-all hover:rotate-[-10deg]" title="Reset Timer"><i class="fa-solid fa-rotate-left"></i></button>
+            </div>
+        </div>
+
+        <!-- 2. GOALS -->
+        <div id="widget-goals" class="draggable-item glass-panel rounded-2xl p-6 flex flex-col h-[350px]" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-list-check text-green-400 mr-2"></i> Daily Goals</h3>
+                <div class="flex gap-2">
+                    <span class="text-xs text-cma-muted mt-1" id="daily-progress">0/0</span>
+                    <button onclick="confirmRemove('widget-goals'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="new-goal-input" placeholder="Add task..." class="flex-1 bg-black/30 border border-white/10 rounded px-3 py-2 text-sm focus:border-white/30 outline-none text-white placeholder-gray-500">
+                <button onclick="addGoal()" class="bg-white/10 hover:bg-white/20 px-3 rounded text-white active:scale-90"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <ul id="goals-list" class="flex-1 overflow-y-auto pr-1 space-y-2"></ul>
+        </div>
+
+        <!-- 3. MILESTONES -->
+        <div id="widget-milestones" class="draggable-item glass-panel rounded-2xl p-6 flex flex-col h-[350px]" draggable="true" ondragstart="drag(event)">
+             <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-flag text-purple-400 mr-2"></i> Milestones</h3>
+                <button onclick="confirmRemove('widget-milestones'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex gap-2 mb-2">
+                <input type="text" id="new-milestone-input" placeholder="Weekly target..." class="flex-1 bg-black/30 border border-white/10 rounded px-2 py-1 text-sm outline-none text-white placeholder-gray-500">
+                <button onclick="addMilestone()" class="bg-purple-500/20 text-purple-300 px-2 rounded text-xs border border-purple-500/30 hover:bg-purple-500/40 active:scale-95">Add</button>
+            </div>
+            <div id="milestone-list" class="space-y-1 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- 4. WATER -->
+        <div id="widget-water" class="draggable-item glass-panel rounded-2xl p-6" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-glass-water text-blue-400 mr-2"></i> Hydration</h3>
+                <div class="flex gap-3">
+                    <button onclick="toggleWaterReminder(); audio.playClick();" class="transition-colors hover:text-white p-1" title="Toggle Alert">
+                        <i id="water-bell" class="fa-solid fa-bell-slash text-gray-500"></i>
+                    </button>
+                    <button onclick="confirmRemove('widget-water'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="addWater()" id="water-btn" class="border border-blue-500/50 bg-blue-900/20 p-3 rounded-xl hover:bg-blue-900/40 transition-all active:scale-90 active:bg-blue-800">
+                    <i class="fa-solid fa-glass-water text-2xl text-blue-400"></i>
+                </button>
+                <div class="flex-1">
+                    <div class="flex justify-between text-sm mb-1 font-bold text-white"><span id="water-count">0</span>/8 glasses</div>
+                    <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden"><div id="water-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. CALCULATOR -->
+        <div id="widget-calc" class="draggable-item glass-panel rounded-2xl p-5" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-calculator accent-text mr-2"></i> Sci-Calc</h3>
+                <button onclick="confirmRemove('widget-calc'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="bg-black/30 p-2 rounded mb-2 text-right font-mono text-xl text-accent-primary h-10 tracking-widest" id="calc-display">0</div>
+            <div class="grid grid-cols-5 gap-1.5 text-xs">
+                <button onclick="calcInput('sin(')" class="p-2 bg-white/5 rounded text-blue-300 hover:bg-white/10">sin</button>
+                <button onclick="calcInput('cos(')" class="p-2 bg-white/5 rounded text-blue-300 hover:bg-white/10">cos</button>
+                <button onclick="calcInput('tan(')" class="p-2 bg-white/5 rounded text-blue-300 hover:bg-white/10">tan</button>
+                <button onclick="calcInput('log(')" class="p-2 bg-white/5 rounded text-blue-300 hover:bg-white/10">log</button>
+                <button onclick="calcClear()" class="p-2 bg-red-900/50 text-red-200 rounded font-bold hover:bg-red-800/50">AC</button>
+                <button onclick="calcInput('7')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">7</button>
+                <button onclick="calcInput('8')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">8</button>
+                <button onclick="calcInput('9')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">9</button>
+                <button onclick="calcDelete()" class="p-2 bg-white/10 rounded text-gray-300 hover:bg-white/20">Del</button>
+                <button onclick="calcInput('/')" class="p-2 bg-white/5 rounded accent-text hover:bg-white/10">÷</button>
+                <button onclick="calcInput('4')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">4</button>
+                <button onclick="calcInput('5')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">5</button>
+                <button onclick="calcInput('6')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">6</button>
+                <button onclick="calcInput('*')" class="p-2 bg-white/5 rounded accent-text hover:bg-white/10">×</button>
+                <button onclick="calcInput('-')" class="p-2 bg-white/5 rounded accent-text hover:bg-white/10">-</button>
+                <button onclick="calcInput('1')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">1</button>
+                <button onclick="calcInput('2')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">2</button>
+                <button onclick="calcInput('3')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">3</button>
+                <button onclick="calcInput('sqrt(')" class="p-2 bg-white/5 rounded text-blue-300 hover:bg-white/10">√</button>
+                <button onclick="calcInput('+')" class="p-2 bg-white/5 rounded accent-text hover:bg-white/10">+</button>
+                <button onclick="calcInput('0')" class="col-span-2 p-2 bg-white/10 rounded text-white hover:bg-white/20">0</button>
+                <button onclick="calcInput('.')" class="p-2 bg-white/10 rounded text-white hover:bg-white/20">.</button>
+                <button onclick="calcResult()" class="col-span-2 p-2 accent-bg rounded font-bold text-black hover:opacity-90">=</button>
+            </div>
+        </div>
+
+        <!-- 6. NOTES -->
+        <div id="widget-notes" class="draggable-item glass-panel rounded-2xl p-6 flex flex-col h-[350px]" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-note-sticky text-pink-400 mr-2"></i> Notes</h3>
+                <div class="flex gap-2">
+                    <button onclick="clearNotes(); audio.playClick();" class="text-xs text-cma-muted hover:text-white px-2 py-1 rounded hover:bg-white/5">Clear</button>
+                    <button onclick="confirmRemove('widget-notes'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <textarea id="note-input" rows="2" placeholder="Quick note..." class="w-full bg-black/30 border border-white/10 rounded p-2 text-sm focus:border-white/30 outline-none resize-none mb-2 text-white placeholder-gray-500"></textarea>
+            <div class="flex gap-2 mb-2">
+                <input type="datetime-local" id="note-time" class="bg-gray-800 text-xs rounded border border-gray-700 px-2 flex-1 text-white">
+                <button onclick="addNote()" class="bg-pink-900/40 text-pink-200 text-xs py-1 px-3 rounded border border-pink-700 hover:bg-pink-900 active:scale-95 transition-transform">Save</button>
+            </div>
+            <div id="notes-list" class="flex-1 overflow-y-auto space-y-2 pr-1"></div>
+        </div>
+
+        <!-- 7. BREATHING -->
+        <div id="widget-breathing" class="draggable-item glass-panel rounded-2xl p-6 flex flex-col items-center" draggable="true" ondragstart="drag(event)">
+            <div class="w-full flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-lungs accent-text mr-2"></i> Breathe</h3>
+                <button onclick="confirmRemove('widget-breathing'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="relative w-32 h-32 flex items-center justify-center mb-4">
+                <div id="breath-circle" class="breathing-circle absolute"></div>
+                <span id="breath-text" class="text-xs font-bold relative z-10 text-center text-white">Ready?</span>
+            </div>
+            <button onclick="toggleBreathing()" id="breath-btn" class="text-xs border border-white/20 hover:bg-white/10 px-4 py-2 rounded-full transition-all text-white active:scale-95">Start</button>
+        </div>
+
+        <!-- 8. CALENDAR -->
+        <div id="widget-calendar" class="draggable-item glass-panel rounded-2xl p-6" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-white"><i class="fa-regular fa-calendar accent-text mr-2"></i> <span id="cal-month-year"></span></h3>
+                <button onclick="confirmRemove('widget-calendar'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-xs mb-2 text-cma-muted">
+                <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+            </div>
+            <div id="cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm text-gray-300"></div>
+        </div>
+        
+        <!-- 9. EXAM COUNTDOWN -->
+        <div id="widget-exam" class="draggable-item glass-panel rounded-2xl p-6" draggable="true" ondragstart="drag(event)">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-hourglass-half accent-text mr-2"></i> Exam Day</h3>
+                <button onclick="confirmRemove('widget-exam'); audio.playClick();" class="text-gray-600 hover:text-red-400 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="exam-setup" class="flex flex-col gap-2">
+                <input type="date" id="exam-date-input" class="bg-gray-800 text-white p-2 rounded text-sm outline-none focus:border-white">
+                <button onclick="setExamDate(); audio.playSuccess();" class="accent-bg text-black font-bold py-1 rounded text-sm hover:opacity-90 active:scale-95 transition-transform">Start Countdown</button>
+            </div>
+            <div id="exam-display" class="hidden text-center">
+                <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div class="bg-white/5 rounded p-2 hover:bg-white/10 transition-colors"><div id="exam-d" class="text-xl font-bold accent-text">0</div><div class="text-[10px] text-gray-400">Days</div></div>
+                    <div class="bg-white/5 rounded p-2 hover:bg-white/10 transition-colors"><div id="exam-h" class="text-xl font-bold text-white">0</div><div class="text-[10px] text-gray-400">Hrs</div></div>
+                    <div class="bg-white/5 rounded p-2 hover:bg-white/10 transition-colors"><div id="exam-m" class="text-xl font-bold text-white">0</div><div class="text-[10px] text-gray-400">Mins</div></div>
+                </div>
+                <button onclick="resetExamDate(); audio.playClick();" class="text-xs text-cma-muted underline hover:text-white">Edit Date</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        const KEY = "CMA_COMPANION_V11";
+        
+        // Data & Layout
+        const WIDGET_INFO = [
+            { id: 'widget-timer', name: 'Focus Timer', icon: 'fa-stopwatch' },
+            { id: 'widget-goals', name: 'Daily Goals', icon: 'fa-list-check' },
+            { id: 'widget-milestones', name: 'Milestones', icon: 'fa-flag' },
+            { id: 'widget-water', name: 'Hydration', icon: 'fa-glass-water' },
+            { id: 'widget-calc', name: 'Calculator', icon: 'fa-calculator' },
+            { id: 'widget-notes', name: 'Notes', icon: 'fa-note-sticky' },
+            { id: 'widget-calendar', name: 'Calendar', icon: 'fa-calendar' },
+            { id: 'widget-breathing', name: 'Breathing', icon: 'fa-lungs' },
+            { id: 'widget-exam', name: 'Exam Countdown', icon: 'fa-hourglass-half' }
+        ];
+
+        // Layout Locked to V5 Screenshot
+        const DEFAULT_LAYOUT = {
+            col1: ['widget-timer', 'widget-goals', 'widget-milestones'],
+            col2: ['widget-water', 'widget-calc', 'widget-notes']
+        };
+
+        const QUOTES = [
+            "Hey {name}, hope you are doing great! Keep going.",
+            "{name}, take a deep breath. You are capable of amazing things.",
+            "Just checking in, {name}. Remember to drink water!",
+            "One step at a time, {name}. You are building your future.",
+            "Hey {name}, success is yours. Stay consistent.",
+            "Believe in yourself, {name}. You've got this.",
+            "Don't stop until you're proud, {name}."
+        ];
+
+        const EMOJIS = ['🚀', '💡', '🔥', '🎯', '🦁', '📚', '🎓', '⭐', '⚡', '🏆'];
+        
+        // Dynamic Notification Messages
+        const TIMER_START_MSGS = [
+            "Focus Mode: ON. You got this!",
+            "Time to build your future, {name}.",
+            "Deep work session starting now.",
+            "Distractions off. Success on.",
+            "Let's crush this study session!"
+        ];
+        
+        const TIMER_END_MSGS = [
+            "Great session! Take a well-deserved break.",
+            "Session complete. Your brain thanks you!",
+            "Progress unlocked. Rest up, {name}.",
+            "Time to recharge. Good work!",
+            "One step closer to CMA. Relax now."
+        ];
+        
+        const GOAL_COMPLETE_MSGS = [
+            "Goal crushed! Amazing work.",
+            "One less thing to worry about. Nice!",
+            "Momentum is building, {name}!",
+            "Checkmate. Task complete.",
+            "Excellent work! Keep the streak alive."
+        ];
+        
+        const NOTE_SAVED_MSGS = [
+            "Note secured.",
+            "Idea captured!",
+            "Written down. safe and sound.",
+            "Saved for later review.",
+            "Memory banked."
+        ];
+
+        let state = {
+            username: "", theme: "default",
+            layout: JSON.parse(JSON.stringify(DEFAULT_LAYOUT)),
+            goals: [], milestones: [], notes: [],
+            water: { count: 0, date: new Date().toDateString(), active: false },
+            timer: { work: 25, break: 5, time: 1500, run: false, mode: 'work', last: Date.now() },
+            calc: "0", examDate: null, alertsEnabled: false,
+            soundEnabled: false, voiceEnabled: false
+        };
+
+        let pendingRemoveId = null;
+
+        // --- AUDIO ENGINE (Pure JS Synthesizer - No External Files) ---
+        const audio = {
+            ctx: null,
+            init: function() {
+                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            },
+            playTone: function(freq, type, duration, vol = 0.1) {
+                if (!state.soundEnabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            playClick: function() { this.playTone(800, 'sine', 0.1, 0.05); },
+            playSuccess: function() { 
+                if (!state.soundEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => { // C Major Arpeggio
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.frequency.value = f;
+                    osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0.05, now + i*0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i*0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i*0.1);
+                    osc.stop(now + i*0.1 + 0.3);
+                });
+            },
+            playAlert: function() {
+                if (!state.soundEnabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                // Triple Beep Alarm Sequence
+                for(let i=0; i<3; i++) {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const start = now + i*0.4;
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(880, start);
+                    osc.frequency.exponentialRampToValueAtTime(440, start + 0.2);
+                    gain.gain.setValueAtTime(0.1, start);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + 0.25);
+                }
+            },
+            playDrop: function() { this.playTone(150, 'sine', 0.2, 0.1); },
+            playDelete: function() { this.playTone(200, 'sawtooth', 0.1, 0.05); },
+            speak: function(text) {
+                if (!state.voiceEnabled) return;
+                if ('speechSynthesis' in window) {
+                    // Cancel current speech to avoid queue buildup
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    // Try to select a good voice
+                    const voices = window.speechSynthesis.getVoices();
+                    const preferred = voices.find(v => v.name.includes('Google US English') || v.name.includes('Samantha'));
+                    if (preferred) utterance.voice = preferred;
+                    utterance.rate = 1.1; // Slightly energetic
+                    utterance.pitch = 1.1;
+                    window.speechSynthesis.speak(utterance);
+                }
+            }
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            if(!state.username) document.getElementById('welcome-modal').classList.add('active');
+            else updateName();
+            
+            applyTheme(state.theme);
+            updateSoundIcon();
+            updateVoiceIcon();
+            renderLayout();
+            renderSidebar();
+            
+            // Render Contents
+            renderGoals(); renderMilestones(); renderNotes(); updateWater(); updateCalc(); updateTimer(); renderCalendar(); checkExamWidget();
+            
+            // Loops
+            setInterval(() => { document.getElementById('current-date').innerText = new Date().toLocaleDateString(); }, 1000);
+            setInterval(tickTimer, 1000);
+            setInterval(checkReminders, 10000);
+            setInterval(waterReminderCheck, 60000);
+            setInterval(updateExamCountdown, 60000);
+            displayRandomQuote();
+            changeHeaderIcon(); 
+
+            // Initial check for permissions button state
+            checkNotificationStatus();
+            
+            // Click outside to close theme menu
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('theme-menu');
+                const btn = event.target.closest('button');
+                if (!menu.classList.contains('hidden') && (!btn || !btn.querySelector('.fa-palette'))) {
+                    menu.classList.add('hidden');
+                }
+            });
+        });
+
+        // --- CORE ---
+        function saveState() { localStorage.setItem(KEY, JSON.stringify(state)); }
+        function loadState() {
+            const s = localStorage.getItem(KEY);
+            if(s) {
+                const parsed = JSON.parse(s);
+                state = { ...state, ...parsed };
+                if(!state.layout.col1) state.layout = JSON.parse(JSON.stringify(DEFAULT_LAYOUT));
+                if(state.water.date !== new Date().toDateString()) { state.water.count = 0; state.water.date = new Date().toDateString(); }
+                // Ensure new fields exist
+                if(typeof state.soundEnabled === 'undefined') state.soundEnabled = false;
+                if(typeof state.voiceEnabled === 'undefined') state.voiceEnabled = false;
+            }
+        }
+        
+        function changeHeaderIcon() {
+            const el = document.getElementById('dynamic-icon');
+            el.classList.remove('icon-pop');
+            void el.offsetWidth;
+            const randomEmoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+            el.innerText = randomEmoji;
+            el.classList.add('icon-pop');
+        }
+
+        // --- QUOTES ---
+        function displayRandomQuote() {
+            const q = QUOTES[Math.floor(Math.random()*QUOTES.length)];
+            document.getElementById('quote-display').innerText = `"${q.replace(/{name}/g, state.username)}"`;
+        }
+
+        // --- THEME ---
+        function toggleThemeMenu(e) {
+            e.stopPropagation();
+            document.getElementById('theme-menu').classList.toggle('hidden');
+        }
+        
+        function setTheme(t) { 
+            state.theme=t; 
+            applyTheme(t); 
+            saveState(); 
+            document.getElementById('theme-menu').classList.add('hidden');
+        }
+
+        function applyTheme(t) {
+            document.body.setAttribute('data-theme', t);
+            // Highlight selected theme
+            document.querySelectorAll('#theme-menu button').forEach(btn => {
+                if(btn.dataset.themeId === t) {
+                    btn.classList.add('theme-active');
+                    if(!btn.querySelector('.check-icon')) {
+                        btn.innerHTML += ' <i class="fa-solid fa-check text-green-400 check-icon"></i>';
+                    }
+                } else {
+                    btn.classList.remove('theme-active');
+                    const icon = btn.querySelector('.check-icon');
+                    if(icon) icon.remove();
+                }
+            });
+        }
+
+        // --- AUDIO & VOICE TOGGLES ---
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            saveState();
+            updateSoundIcon();
+            if(state.soundEnabled) audio.playSuccess(); // Feedback
+        }
+        
+        function updateSoundIcon() {
+            const btn = document.getElementById('sound-btn');
+            btn.innerHTML = state.soundEnabled ? '<i class="fa-solid fa-volume-high text-white"></i>' : '<i class="fa-solid fa-volume-xmark"></i>';
+            btn.classList.toggle('text-white', state.soundEnabled);
+        }
+
+        function toggleVoice() {
+            state.voiceEnabled = !state.voiceEnabled;
+            saveState();
+            updateVoiceIcon();
+            if(state.voiceEnabled) audio.speak(`Voice activated, ${state.username}. Let's get to work.`);
+        }
+
+        function updateVoiceIcon() {
+            const btn = document.getElementById('voice-btn');
+            btn.innerHTML = state.voiceEnabled ? '<i class="fa-solid fa-microphone text-white"></i>' : '<i class="fa-solid fa-microphone-slash"></i>';
+            btn.classList.toggle('text-white', state.voiceEnabled);
+        }
+
+        // --- NOTIFICATIONS & TOASTS ---
+        function checkNotificationStatus() {
+            if ("Notification" in window && Notification.permission === 'granted') {
+                document.getElementById('notif-btn').style.display = 'none';
+            } else {
+                document.getElementById('notif-btn').style.display = 'flex';
+            }
+        }
+
+        function requestNotificationPermission() { 
+            state.alertsEnabled = true; 
+            saveState();
+            document.getElementById('notif-btn').style.display='none';
+            if (!("Notification" in window)) {
+                notify("System", "Notifications not supported in this browser.");
+                return;
+            }
+            Notification.requestPermission().then(p => { 
+                if(p==='granted') { 
+                    notify("CMA Companion", "Notifications Enabled!"); 
+                } else {
+                    notify("System", "Browser alerts blocked, but in-app toasts are on!");
+                }
+            }); 
+        }
+
+        function notify(title, body) {
+            const t = document.createElement('div');
+            t.className = "glass-panel px-4 py-3 rounded-lg border-l-4 border-cma-gold text-white text-sm animate-fade-in mb-2 shadow-lg";
+            t.innerHTML = `<div class="font-bold text-xs accent-text mb-1">${title}</div><div>${body}</div>`;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(()=>t.remove(), 5000);
+
+            if ("Notification" in window && Notification.permission === 'granted') {
+                try {
+                    new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/2921/2921222.png' });
+                } catch (e) {}
+            }
+        }
+        
+        function getRandomMsg(arr) {
+            return arr[Math.floor(Math.random() * arr.length)].replace(/{name}/g, state.username);
+        }
+
+        // --- WIDGETS ---
+        
+        // Timer
+        function toggleSettingsModal() { document.getElementById('settings-modal').classList.toggle('active'); 
+            if(document.getElementById('settings-modal').classList.contains('active')) {
+                document.getElementById('setting-work').value = state.timer.work;
+                document.getElementById('setting-break').value = state.timer.break;
+            }
+        }
+        function saveTimerSettings() {
+            const w = parseInt(document.getElementById('setting-work').value);
+            const b = parseInt(document.getElementById('setting-break').value);
+            if(w>0 && b>0) { state.timer.work=w; state.timer.break=b; manualSwitchMode(state.timer.mode==='work'); toggleSettingsModal(); }
+        }
+        function manualSwitchMode(work) {
+            state.timer.mode = work?'work':'break'; state.timer.time = work?state.timer.work*60:state.timer.break*60; state.timer.run=false;
+            updateTimer(); saveState();
+        }
+        function toggleTimer() { 
+            state.timer.run = !state.timer.run; 
+            state.timer.last = Date.now(); 
+            updateTimer(); 
+            saveState();
+            if(state.timer.run) {
+                changeHeaderIcon(); 
+                const type = state.timer.mode === 'work' ? "Focus Session" : "Break Time";
+                const msg = state.timer.mode === 'work' ? getRandomMsg(TIMER_START_MSGS) : "Relax and recharge.";
+                notify(type, msg);
+                audio.playSuccess();
+                if(state.timer.mode === 'work') audio.speak(`Starting focus session. ${msg}`);
+                else audio.speak("Break started. Relax.");
+            }
+        }
+        function resetTimer() { 
+            state.timer.run = false; 
+            state.timer.time = state.timer.mode === 'work' ? state.timer.work*60 : state.timer.break*60;
+            updateTimer(); saveState();
+        }
+        function tickTimer() {
+            if(!state.timer.run) { state.timer.last=Date.now(); return; }
+            const now = Date.now(); const delta = Math.floor((now-state.timer.last)/1000);
+            if(delta >= 1) {
+                state.timer.time -= delta; state.timer.last = now;
+                if(state.timer.time <= 0) {
+                    state.timer.time=0; state.timer.run=false;
+                    const title = state.timer.mode==='work' ? "Session Complete!" : "Break Over!";
+                    const msg = state.timer.mode==='work' ? getRandomMsg(TIMER_END_MSGS) : `Let's get back to focus, ${state.username}.`;
+                    notify(title, msg);
+                    changeHeaderIcon();
+                    audio.playAlert(); // Distinct Alarm
+                    audio.speak(msg); // Speak message
+                    manualSwitchMode(state.timer.mode!=='work');
+                }
+                updateTimer(); saveState();
+            }
+        }
+        function updateTimer() {
+            const m=Math.floor(state.timer.time/60); const s=state.timer.time%60;
+            document.getElementById('timer-display').innerText = `${m}:${s<10?'0':''}${s}`;
+            document.getElementById('start-btn').innerText = state.timer.run ? "Pause" : "Start";
+            document.getElementById('start-btn').className = state.timer.run ? "flex-1 bg-red-600 font-bold py-3 rounded-lg text-white transition-all shadow-lg active:scale-95" : "flex-1 accent-bg font-bold py-3 rounded-lg text-black transition-all shadow-lg active:scale-95";
+            
+            document.getElementById('tab-work').className = state.timer.mode==='work' ? "flex-1 py-1.5 text-xs font-bold rounded accent-bg text-black transition-all" : "flex-1 py-1.5 text-xs font-bold rounded text-cma-muted hover:text-white transition-all";
+            document.getElementById('tab-break').className = state.timer.mode!=='work' ? "flex-1 py-1.5 text-xs font-bold rounded bg-green-500 text-white transition-all" : "flex-1 py-1.5 text-xs font-bold rounded text-cma-muted hover:text-white transition-all";
+        }
+
+        // Water
+        function toggleWaterReminder() {
+            if(!state.alertsEnabled) requestNotificationPermission();
+            state.water.active = !state.water.active;
+            updateWater(); saveState();
+            if(state.water.active) notify("Hydration Alerts On", "I'll remind you every 60 minutes.");
+            else notify("Hydration Alerts Off", "Reminders paused.");
+        }
+        function addWater() { 
+            state.water.count++; 
+            saveState(); 
+            updateWater();
+            
+            const motivations = ["Hydration +1. Great job!", "Your brain thanks you!", "Keep that energy up!", "Water fuel added."];
+            const msg = motivations[Math.floor(Math.random() * motivations.length)];
+            notify("Hydration Tracked", msg);
+            audio.playDrop();
+            audio.speak("Water recorded. Good job.");
+        }
+        function updateWater() {
+            document.getElementById('water-count').innerText = state.water.count;
+            document.getElementById('water-bar').style.width = `${Math.min((state.water.count/8)*100,100)}%`;
+            const btn = document.getElementById('water-btn');
+            if(state.water.count < 8) btn.classList.add('water-blink'); else btn.classList.remove('water-blink');
+            
+            const bell = document.getElementById('water-bell');
+            bell.className = state.water.active ? "fa-solid fa-bell accent-text" : "fa-solid fa-bell-slash text-gray-500";
+        }
+        
+        function waterReminderCheck() {
+            if(state.water.active) {
+                const m = new Date().getMinutes();
+                if(m === 0) {
+                     const msg = `Hey ${state.username}, time for a hydration break.`;
+                     notify("Drink Water!", msg);
+                     audio.playAlert(); // Distinct Alarm
+                     audio.speak(msg);
+                }
+            }
+        }
+
+        // Goals
+        function addGoal() { const i=document.getElementById('new-goal-input'); if(i.value.trim()){ state.goals.push({id:Date.now(), text:i.value.trim(), completed:false}); i.value=''; saveState(); renderGoals(true); audio.playClick(); } }
+        function toggleGoal(id) { 
+            const g=state.goals.find(x=>x.id===id); 
+            if(g){ 
+                g.completed=!g.completed; 
+                saveState(); renderGoals(false); 
+                audio.playClick();
+                if(g.completed) {
+                    const msg = getRandomMsg(GOAL_COMPLETE_MSGS);
+                    notify("Goal Complete", msg);
+                    changeHeaderIcon();
+                    audio.playSuccess();
+                    audio.speak(msg);
+                }
+            } 
+        }
+        function renderGoals(animate = false) { 
+            document.getElementById('daily-progress').innerText = `${state.goals.filter(x=>x.completed).length}/${state.goals.length}`;
+            document.getElementById('goals-list').innerHTML = state.goals.map(g=>`<li class="flex items-center p-2 rounded hover:bg-white/5 group"><input type="checkbox" ${g.completed?'checked':''} onchange="toggleGoal(${g.id})" class="mr-2 accent-green-400 cursor-pointer transform transition-transform duration-200 hover:scale-110"><span class="${g.completed?'line-through text-gray-500':'text-gray-300'} text-sm flex-1 cursor-pointer transition-colors" onclick="toggleGoal(${g.id})">${g.text}</span><button onclick="state.goals=state.goals.filter(x=>x.id!==${g.id});saveState();renderGoals();audio.playDelete()" class="text-gray-600 hover:text-red-400 hidden group-hover:block transition-colors"><i class="fa-solid fa-trash-can"></i></button></li>`).join('');
+        }
+
+        // Milestones
+        function addMilestone() { const i=document.getElementById('new-milestone-input'); if(i.value.trim()){ state.milestones.push({id:Date.now(), text:i.value.trim()}); i.value=''; saveState(); renderMilestones(); notify("Milestone Set", "Target locked. Go get it!"); audio.playSuccess(); } }
+        function renderMilestones() { 
+            document.getElementById('milestone-list').innerHTML = state.milestones.map(m=>`<div class="bg-white/5 p-2 rounded text-sm flex justify-between group mb-1 hover:bg-white/10 transition-colors"><span><i class="fa-solid fa-flag text-purple-400 mr-2"></i>${m.text}</span><button onclick="state.milestones=state.milestones.filter(x=>x.id!==${m.id});saveState();renderMilestones();audio.playDelete()" class="text-gray-600 hover:text-red-400 hidden group-hover:block transition-colors"><i class="fa-solid fa-trash-can"></i></button></div>`).join(''); 
+        }
+
+        // Notes
+        function addNote() {
+            const txt = document.getElementById('note-input'); const tm = document.getElementById('note-time');
+            if(txt.value.trim()){ state.notes.push({id:Date.now(), text:txt.value.trim(), time:tm.value, notified:false}); txt.value=''; tm.value=''; saveState(); renderNotes(); const msg = getRandomMsg(NOTE_SAVED_MSGS); notify("Note Saved", msg); audio.playClick(); audio.speak(msg); }
+        }
+        function renderNotes() {
+            document.getElementById('notes-list').innerHTML = state.notes.map(n => {
+                const t = n.time ? new Date(n.time).toLocaleString([],{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+                return `<div class="bg-white/5 p-2 rounded text-sm relative group mb-2 border-l-2 border-pink-400 hover:bg-white/10 transition-colors">
+                    <div class="pr-5 break-words text-gray-200">${n.text}</div>
+                    ${t ? `<div class="text-xs text-pink-300 mt-1"><i class="fa-regular fa-clock"></i> ${t}</div>` : ''}
+                    <button onclick="deleteNote(${n.id})" class="absolute top-1 right-1 text-gray-500 hover:text-red-400 hidden group-hover:block transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`;
+            }).join('');
+        }
+        function deleteNote(id) { state.notes = state.notes.filter(n=>n.id!==id); saveState(); renderNotes(); audio.playDelete(); }
+        function checkReminders() {
+            const now = new Date(); let chg = false;
+            state.notes.forEach(n => {
+                if(n.time && !n.notified && now >= new Date(n.time)) {
+                    const msg = `Hey ${state.username}, don't forget: ${n.text}`;
+                    notify("Reminder", msg);
+                    audio.playAlert(); // Distinct Alarm
+                    audio.speak(msg);
+                    n.notified = true; chg = true;
+                }
+            });
+            if(chg) { saveState(); renderNotes(); }
+        }
+
+        // Layout & Sidebar
+        function renderLayout() {
+            const move = (id, col) => { const el = document.getElementById(id); const dest = document.getElementById(col); if(el && dest) { el.classList.remove('hidden'); dest.appendChild(el); } };
+            state.layout.col1.forEach(id => move(id, 'col-1')); state.layout.col2.forEach(id => move(id, 'col-2'));
+        }
+        function renderSidebar() {
+            const list = document.getElementById('sidebar-list'); list.innerHTML = '';
+            const active = [...state.layout.col1, ...state.layout.col2];
+            const inactive = WIDGET_INFO.filter(w => !active.includes(w.id));
+            if(inactive.length === 0) list.innerHTML = '<div class="text-sm text-gray-500 text-center italic">All widgets active</div>';
+            inactive.forEach(w => {
+                const div = document.createElement('div'); div.className = "flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors";
+                div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${w.icon} accent-text"></i><span class="text-sm font-bold text-gray-200">${w.name}</span></div><button onclick="addWidget('${w.id}'); audio.playDrop();" class="text-green-400 hover:text-green-300 transition-colors active:scale-110"><i class="fa-solid fa-plus-circle"></i></button>`;
+                list.appendChild(div);
+            });
+        }
+        function addWidget(id) {
+            if(state.layout.col1.length <= state.layout.col2.length) state.layout.col1.push(id); else state.layout.col2.push(id);
+            saveState(); renderLayout(); renderSidebar();
+        }
+        function confirmRemove(id) { pendingRemoveId = id; document.getElementById('remove-modal').classList.add('active'); audio.playClick(); }
+        document.getElementById('confirm-remove-btn').onclick = () => {
+            if(pendingRemoveId) {
+                state.layout.col1 = state.layout.col1.filter(x => x !== pendingRemoveId); state.layout.col2 = state.layout.col2.filter(x => x !== pendingRemoveId);
+                document.getElementById('widget-store').appendChild(document.getElementById(pendingRemoveId));
+                saveState(); renderSidebar(); closeRemoveModal(); audio.playDelete();
+            }
+        };
+        function closeRemoveModal() { document.getElementById('remove-modal').classList.remove('active'); pendingRemoveId = null; }
+        function toggleSidebar() { document.getElementById('widget-sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('hidden'); }
+
+        // Utils
+        function saveNameAndStart() { const n = document.getElementById('username-input').value.trim(); if(n){ state.username=n; saveState(); document.getElementById('welcome-modal').classList.remove('active'); updateName(); audio.playSuccess(); audio.speak(`Welcome to your study space, ${n}.`); } }
+        function updateName() { document.getElementById('header-name').innerText = state.username; displayRandomQuote(); }
+        function applyTheme(t) { document.body.setAttribute('data-theme', t); }
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) { ev.preventDefault(); const data = ev.dataTransfer.getData("text"); const zone = ev.currentTarget; document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over')); if(zone.classList.contains('drop-zone')) { zone.appendChild(document.getElementById(data)); saveLayoutState(); audio.playDrop(); } }
+        function saveLayoutState() { state.layout.col1 = Array.from(document.getElementById('col-1').children).map(el=>el.id); state.layout.col2 = Array.from(document.getElementById('col-2').children).map(el=>el.id); saveState(); }
+        
+        // Other Widgets (Breathing, Calc, Calendar, Exam)
+        let breathInt;
+        function toggleBreathing() {
+            const circle = document.getElementById('breath-circle'); const txt = document.getElementById('breath-text'); const btn = document.getElementById('breath-btn');
+            audio.playClick();
+            if(circle.classList.contains('breathing-active')) { circle.classList.remove('breathing-active'); txt.innerText="Ready?"; btn.innerText="Start"; clearInterval(breathInt); }
+            else { 
+                circle.classList.add('breathing-active'); btn.innerText="Stop"; 
+                let p=0; 
+                const phases = ["Inhale (4s)", "Hold (4s)", "Exhale (4s)", "Hold (4s)"];
+                const cycle = () => { 
+                    txt.innerText = phases[p]; 
+                    if(state.soundEnabled) audio.playTone(200 + (p%2)*100, 'sine', 1, 0.05); // Subtle tone for breath phases
+                    p=(p+1)%4; 
+                }; 
+                cycle(); 
+                breathInt = setInterval(cycle, 4000); 
+                audio.speak("Follow the breathing circle. Relax.");
+            }
+        }
+        function calcInput(v) { 
+            if(state.calc==="0" && !"+-*/.".includes(v)) state.calc=v; else state.calc+=v; 
+            updateCalc(); 
+            if(state.soundEnabled) audio.playTone(600, 'sine', 0.05, 0.02); // Very short blip
+        }
+        function calcDelete() { state.calc = state.calc.length>1 ? state.calc.slice(0,-1) : "0"; updateCalc(); audio.playDelete(); }
+        function calcResult() { try { state.calc = String(parseFloat(eval(state.calc).toFixed(6))); audio.playSuccess(); } catch(e){state.calc="Error"; audio.playDelete();} updateCalc(); }
+        function calcClear() { state.calc="0"; updateCalc(); audio.playDelete(); }
+        function updateCalc() { document.getElementById('calc-display').innerText = state.calc; saveState(); }
+        function renderCalendar() {
+            const now = new Date(); document.getElementById('cal-month-year').innerText = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+            const days = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(); const start = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+            const grid = document.getElementById('cal-grid'); grid.innerHTML = '';
+            for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
+            for(let i=1; i<=days; i++) grid.innerHTML += `<div class="p-1 rounded ${i===now.getDate()?'accent-bg font-bold text-cma-dark':'hover:bg-white/10'} transition-colors">${i}</div>`;
+        }
+        function checkExamWidget() { if(state.examDate) { document.getElementById('exam-setup').classList.add('hidden'); document.getElementById('exam-display').classList.remove('hidden'); updateExamCountdown(); } else { document.getElementById('exam-setup').classList.remove('hidden'); document.getElementById('exam-display').classList.add('hidden'); } }
+        function setExamDate() { const d = document.getElementById('exam-date-input').value; if(d) { state.examDate = d; saveState(); checkExamWidget(); audio.playSuccess(); } }
+        function resetExamDate() { state.examDate = null; saveState(); checkExamWidget(); audio.playClick(); }
+        function updateExamCountdown() { if(!state.examDate) return; const diff = new Date(state.examDate) - new Date(); if(diff <= 0) document.getElementById('exam-d').innerText = "0"; else { document.getElementById('exam-d').innerText = Math.floor(diff / (86400000)); document.getElementById('exam-h').innerText = Math.floor((diff % 86400000) / 3600000); document.getElementById('exam-m').innerText = Math.floor((diff % 3600000) / 60000); } }
+    </script>
+</body>
+</html>
