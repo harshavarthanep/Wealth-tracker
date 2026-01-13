@@ -3,507 +3,667 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WealthFlow | Personal Finance OS</title>
+    <title>ZenWealth | Stealth Finance OS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #8b5cf6;
-            --primary-glow: rgba(139, 92, 246, 0.4);
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface-glass: rgba(30, 41, 59, 0.7);
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
+            /* Zen Palette */
+            --bg: #050505;
+            --surface: #0f0f0f;
+            --surface-light: #1a1a1a;
+            --accent: #d4af37; /* Gold */
+            --accent-dim: rgba(212, 175, 55, 0.1);
+            --text-main: #e5e5e5;
+            --text-muted: #737373;
             --success: #10b981;
             --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.05);
             --blur: 0px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- UTILS --- */
+        /* --- TYPOGRAPHY --- */
+        .cinzel { font-family: 'Cinzel', serif; }
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        .blur-sensitive { filter: blur(var(--blur)); transition: 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- ONBOARDING --- */
-        #onboarding { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
-        .input-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: white; width: 100%; max-width: 300px; margin: 10px 0; font-size: 1.1rem; outline: none; text-align: center; }
+        .blur-sensitive { filter: blur(var(--blur)); transition: 0.3s ease; }
         
-        /* --- MAIN LAYOUT --- */
-        header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .user-greeting h1 { font-size: 1.4rem; font-weight: 700; }
-        .user-greeting p { font-size: 0.9rem; color: var(--text-muted); }
-        .top-actions i { font-size: 1.2rem; background: rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        /* --- ANIMATIONS --- */
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-        main { flex: 1; overflow-y: auto; padding: 10px 20px 100px; position: relative; }
-        
+        /* --- HEADER --- */
+        header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); z-index: 50; }
+        .brand { font-size: 1.2rem; font-weight: 600; letter-spacing: 1px; color: var(--accent); }
+        .privacy-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); transition: 0.3s; }
+        .privacy-toggle.active { color: var(--text-main); border-color: var(--accent); }
+
+        /* --- MAIN SCROLL AREA --- */
+        main { flex: 1; overflow-y: auto; padding: 0 20px 100px; scroll-behavior: smooth; }
+
         /* --- CARDS --- */
-        .card { background: var(--surface); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
-        .balance-card { background: linear-gradient(135deg, var(--primary), #6366f1); position: relative; overflow: hidden; }
-        .balance-card::before { content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-        .balance-label { font-size: 0.9rem; opacity: 0.8; }
-        .balance-amount { font-size: 2.5rem; font-weight: 700; margin: 5px 0; letter-spacing: -1px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .card-gold { background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border-color: rgba(212, 175, 55, 0.2); }
+        .card-gold::after { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%); pointer-events: none; }
+
+        /* --- METRICS --- */
+        .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; }
+        .metric-value { font-size: 2.2rem; font-weight: 400; font-family: 'Cinzel', serif; letter-spacing: -1px; }
+        .sub-metric { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+
+        /* --- PROGRESS BARS --- */
+        .progress-track { height: 4px; background: var(--surface-light); width: 100%; border-radius: 2px; margin-top: 15px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; border-radius: 2px; }
+
+        /* --- GRID --- */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .mini-card { background: var(--surface); padding: 16px; border-radius: 16px; border: 1px solid var(--border); }
+        .mini-value { font-size: 1.1rem; font-weight: 600; margin-top: 5px; }
+
+        /* --- LISTS --- */
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 30px; }
+        .list-header h3 { font-size: 1rem; font-weight: 500; color: var(--text-main); }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
+        .list-item:active { opacity: 0.6; }
+        .icon-box { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--text-muted); margin-right: 15px; }
         
-        /* --- METRICS GRID --- */
-        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .metric-item { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 16px; }
-        .metric-label { font-size: 0.8rem; color: var(--text-muted); }
-        .metric-val { font-size: 1.2rem; font-weight: 600; margin-top: 5px; }
-        .inc { color: var(--success); }
-        .exp { color: var(--danger); }
-
-        /* --- MOTIVATION PILL --- */
-        .motivation-pill { background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 10px 15px; border-radius: 12px; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .motivation-pill.warning { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
-
-        /* --- TRANSACTIONS --- */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .section-header h2 { font-size: 1.1rem; }
-        .trans-item { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .trans-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; margin-right: 15px; }
-        .trans-info h4 { font-size: 1rem; font-weight: 500; }
-        .trans-info p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
-
-        /* --- GOALS --- */
-        .goal-item { margin-bottom: 20px; }
-        .goal-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
-        .progress-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 1s ease; }
-        .goal-insight { font-size: 0.8rem; color: var(--primary); margin-top: 5px; font-weight: 500; }
-
         /* --- BOTTOM NAV --- */
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: var(--surface-glass); backdrop-filter: blur(12px); border-radius: 20px; display: flex; justify-content: space-around; padding: 15px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); z-index: 100; }
-        .nav-item { color: var(--text-muted); font-size: 1.2rem; position: relative; transition: 0.3s; cursor: pointer; }
-        .nav-item.active { color: var(--primary); transform: translateY(-3px); }
-        .nav-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--primary); border-radius: 50%; }
+        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; justify-content: space-evenly; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 100; }
+        .dock-item { color: var(--text-muted); font-size: 1.4rem; transition: 0.3s; cursor: pointer; position: relative; }
+        .dock-item.active { color: var(--accent); transform: translateY(-3px); }
+        .dock-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
 
-        /* --- FAB (Add Button) --- */
-        .fab { position: fixed; bottom: 100px; right: 20px; width: 55px; height: 55px; background: var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; box-shadow: 0 0 20px var(--primary-glow); z-index: 90; cursor: pointer; transition: transform 0.2s; }
+        /* --- FAB --- */
+        .fab { position: fixed; bottom: 110px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); z-index: 90; cursor: pointer; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
 
         /* --- MODAL --- */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px); }
-        .modal.active { opacity: 1; pointer-events: all; }
-        .modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 30px 20px; transform: translateY(100%); transition: 0.3s; }
-        .modal.active .modal-content { transform: translateY(0); }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 600; font-size: 1rem; margin-top: 15px; cursor: pointer; }
-        .btn-primary { background: var(--primary); color: white; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(8px); }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
+        .modal-sheet { background: #121212; width: 100%; max-width: 500px; border-radius: 30px 30px 0 0; padding: 30px 24px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--border); }
+        .modal-overlay.active .modal-sheet { transform: translateY(0); }
+        
+        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+        .input-field { width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; }
+        .input-field:focus { border-color: var(--accent); }
+        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); margin-top: 10px; border: 1px solid rgba(239, 68, 68, 0.2); }
 
-        /* --- SETTINGS --- */
-        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .settings-row h4 { font-size: 1rem; }
-        .settings-row p { font-size: 0.8rem; color: var(--text-muted); }
+        /* --- TABS in Modal --- */
+        .tabs { display: flex; background: var(--surface); padding: 4px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .tab { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; color: var(--text-muted); border-radius: 10px; cursor: pointer; }
+        .tab.active { background: var(--surface-light); color: white; font-weight: 600; }
 
     </style>
 </head>
 <body>
 
-    <div id="onboarding" class="hidden">
-        <h1>Welcome to WealthFlow</h1>
-        <p style="color:var(--text-muted); margin-bottom: 30px;">Let's get your finance OS ready.</p>
-        <input type="text" id="setupName" class="input-box" placeholder="What should we call you?">
-        <select id="setupCurrency" class="input-box">
-            <option value="USD">$ - USD</option>
-            <option value="EUR">€ - EUR</option>
-            <option value="INR">₹ - INR</option>
-            <option value="GBP">£ - GBP</option>
-        </select>
-        <button class="btn btn-primary" onclick="completeOnboarding()">Start Journey 🚀</button>
-    </div>
-
     <header>
-        <div class="user-greeting">
-            <p id="greetingTime">Good Morning</p>
-            <h1 id="userNameDisplay">User</h1>
-        </div>
-        <div class="top-actions">
-            <i class="fa-solid fa-eye-slash" id="privacyToggle" onclick="togglePrivacy()"></i>
+        <div class="brand cinzel">ZenWealth</div>
+        <div class="privacy-toggle" id="privacyBtn" onclick="togglePrivacy()">
+            <i class="fa-solid fa-eye-slash"></i>
         </div>
     </header>
 
-    <main id="view-home" class="fade-in">
-        <div class="motivation-pill" id="motivationPill">
-            <i class="fa-solid fa-chart-line"></i>
-            <span id="motivationText">Analyzing your wealth...</span>
-        </div>
-
-        <div class="card balance-card">
-            <div class="balance-label">Total Balance</div>
-            <div class="balance-amount blur-sensitive" id="totalBalance">0.00</div>
-            <div style="font-size: 0.8rem; opacity: 0.8;" id="runwayText">Runway: Calculating...</div>
-        </div>
-
-        <div class="metrics-grid">
-            <div class="metric-item">
-                <div class="metric-label">Income (This Month)</div>
-                <div class="metric-val inc blur-sensitive" id="monthIncome">0.00</div>
-            </div>
-            <div class="metric-item">
-                <div class="metric-label">Expense (This Month)</div>
-                <div class="metric-val exp blur-sensitive" id="monthExpense">0.00</div>
+    <main id="view-home" class="animate-up">
+        <div class="card card-gold">
+            <div class="metric-label">Total Net Worth</div>
+            <div class="metric-value blur-sensitive" id="netWorthDisplay">$0.00</div>
+            <div class="sub-metric blur-sensitive" id="netWorthChange">
+                <i class="fa-solid fa-arrow-trend-up"></i> +0.0% this month
             </div>
         </div>
 
-        <div class="section-header">
-            <h2>Recent Activity</h2>
-            <span style="font-size: 0.8rem; color: var(--primary);" onclick="switchView('analytics')">View All</span>
-        </div>
-        <div id="recentTransactions">
+        <div class="card" style="padding: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.9rem; color:var(--text-main);">Financial Freedom</span>
+                <span style="font-size:0.9rem; color:var(--accent);" id="freedomPercent">0%</span>
             </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="freedomBar"></div>
+            </div>
+            <div class="sub-metric" style="margin-top:10px;">
+                Target: <span class="blur-sensitive" id="freedomTarget">$0</span> (25x Annual Exp)
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="mini-card">
+                <div class="metric-label">Liquid Assets</div>
+                <div class="mini-value blur-sensitive" style="color:var(--success)" id="liquidAssetDisplay">$0</div>
+            </div>
+            <div class="mini-card">
+                <div class="metric-label">Liabilities</div>
+                <div class="mini-value blur-sensitive" style="color:var(--danger)" id="liabilityDisplay">$0</div>
+            </div>
+        </div>
+
+        <div class="list-header">
+            <h3>Recent Activity</h3>
+            <span style="font-size:0.8rem; color:var(--accent); cursor:pointer;" onclick="switchView('activity')">View All</span>
+        </div>
+        <div id="recentList"></div>
     </main>
 
-    <main id="view-analytics" class="hidden fade-in">
-        <h2>Analytics & Health</h2>
-        <div class="card" style="margin-top:20px; height: 300px;">
-            <canvas id="mainChart"></canvas>
-        </div>
+    <main id="view-wealth" class="hidden animate-up">
+        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Assets & Liabilities</h2>
+        
         <div class="card">
-            <h3>Runway Calculator ✈️</h3>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:10px;">Based on your average monthly spending.</p>
-            <div style="font-size:2rem; font-weight:700; color:var(--primary);" id="analyticsRunway">0 Months</div>
+            <div class="list-header" style="margin-top:0;">
+                <h3>Investment Assets</h3>
+                <i class="fa-solid fa-plus" style="color:var(--accent); cursor:pointer;" onclick="openAssetModal()"></i>
+            </div>
+            <div id="assetList"></div>
+        </div>
+
+        <div class="card">
+            <div class="list-header" style="margin-top:0;">
+                <h3>Loans & Liabilities</h3>
+                <i class="fa-solid fa-plus" style="color:var(--danger); cursor:pointer;" onclick="openLiabilityModal()"></i>
+            </div>
+            <div id="liabilityList"></div>
+        </div>
+
+        <div class="card" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
+            <div class="metric-label" style="color:var(--danger)">Debt Freedom Est.</div>
+            <div class="mini-value" id="debtFreeDate">Debt Free</div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Based on current EMIs</p>
         </div>
     </main>
 
-    <main id="view-goals" class="hidden fade-in">
-        <h2>Financial Goals</h2>
-        <div style="margin-top:20px;" id="goalsContainer">
-            </div>
-        <button class="btn btn-primary" onclick="openModal('goalModal')">+ Add New Goal</button>
-    </main>
-
-    <main id="view-settings" class="hidden fade-in">
-        <h2>Settings</h2>
-        <div class="card" style="margin-top:20px;">
-            <div class="settings-row">
-                <div>
-                    <h4>Profile Name</h4>
-                    <p>How we address you</p>
-                </div>
-                <div style="color:var(--primary)" onclick="resetOnboarding()">Edit</div>
-            </div>
-            <div class="settings-row">
-                <div>
-                    <h4>Data Management</h4>
-                    <p>Export or Reset your data</p>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <i class="fa-solid fa-download" onclick="exportData()"></i>
-                    <i class="fa-solid fa-trash" style="color:var(--danger)" onclick="hardReset()"></i>
-                </div>
-            </div>
+    <main id="view-analytics" class="hidden animate-up">
+        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Analytics</h2>
+        
+        <div class="card" style="height: 250px;">
+            <canvas id="cashflowChart"></canvas>
         </div>
-        <div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-top:20px;">
-            WealthFlow v2.0 • Offline & Private
+
+        <div class="card">
+            <div class="metric-label">Runway</div>
+            <div class="metric-value blur-sensitive" id="runwayDisplay">∞</div>
+            <div class="sub-metric">Months you can survive without income</div>
+        </div>
+
+        <div class="card">
+            <div class="list-header" style="margin-top:0;">
+                <h3>Monthly Breakdown</h3>
+            </div>
+            <div id="categoryBreakdown"></div>
         </div>
     </main>
 
-    <div class="fab" onclick="openModal('transModal')">
+    <main id="view-settings" class="hidden animate-up">
+        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Settings</h2>
+        
+        <div class="card">
+            <div class="input-group">
+                <label>Currency Symbol</label>
+                <select id="currencySelect" class="input-field" onchange="updateCurrency()">
+                    <option value="USD">$ USD</option>
+                    <option value="INR">₹ INR</option>
+                    <option value="EUR">€ EUR</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="exportData()"><i class="fa-solid fa-download"></i> Export Data</button>
+            <input type="file" id="importFile" class="hidden" onchange="importData(this)">
+            <button class="btn" style="background:var(--surface-light); color:white; margin-top:10px;" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> Import Data</button>
+            <button class="btn btn-danger" onclick="hardReset()">Factory Reset</button>
+        </div>
+    </main>
+
+    <div class="fab" onclick="openTransModal()">
         <i class="fa-solid fa-plus"></i>
     </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchView('home')"><i class="fa-solid fa-house"></i></div>
-        <div class="nav-item" onclick="switchView('analytics')"><i class="fa-solid fa-chart-pie"></i></div>
-        <div class="nav-item" onclick="switchView('goals')"><i class="fa-solid fa-bullseye"></i></div>
-        <div class="nav-item" onclick="switchView('settings')"><i class="fa-solid fa-gear"></i></div>
-    </nav>
+    <div class="dock">
+        <div class="dock-item active" onclick="switchView('home')"><i class="fa-solid fa-house"></i></div>
+        <div class="dock-item" onclick="switchView('wealth')"><i class="fa-solid fa-gem"></i></div>
+        <div class="dock-item" onclick="switchView('analytics')"><i class="fa-solid fa-chart-pie"></i></div>
+        <div class="dock-item" onclick="switchView('settings')"><i class="fa-solid fa-sliders"></i></div>
+    </div>
 
-    <div class="modal" id="transModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>New Transaction</h2>
-                <i class="fa-solid fa-xmark" style="font-size:1.5rem;" onclick="closeModal('transModal')"></i>
+    <div class="modal-overlay" id="transModal">
+        <div class="modal-sheet">
+            <div class="sheet-header">
+                <h3 id="transModalTitle">New Transaction</h3>
+                <i class="fa-solid fa-times" onclick="closeModal('transModal')" style="cursor:pointer; font-size:1.2rem;"></i>
             </div>
-            <select id="tType" class="input-box" style="text-align:left; background:rgba(0,0,0,0.2);">
-                <option value="expense">Expense 💸</option>
-                <option value="income">Income 💰</option>
-            </select>
-            <input type="text" id="tDesc" class="input-box" placeholder="Description (e.g. Coffee)" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <input type="number" id="tAmount" class="input-box" placeholder="Amount" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <button class="btn btn-primary" onclick="addTransaction()">Save Record</button>
+            <div class="tabs">
+                <div class="tab active" id="tabExpense" onclick="setTransType('expense')">Expense</div>
+                <div class="tab" id="tabIncome" onclick="setTransType('income')">Income</div>
+            </div>
+            <input type="hidden" id="tId"> <div class="input-group">
+                <input type="text" id="tDesc" class="input-field" placeholder="Description (e.g. Dinner)">
+            </div>
+            <div class="input-group">
+                <input type="number" id="tAmt" class="input-field" placeholder="Amount">
+            </div>
+            <div class="input-group">
+                <select id="tCat" class="input-field">
+                    <option value="Food">🍔 Food</option>
+                    <option value="Transport">🚕 Transport</option>
+                    <option value="Shopping">🛍️ Shopping</option>
+                    <option value="Bills">🧾 Bills</option>
+                    <option value="Salary">💰 Salary</option>
+                    <option value="Investment">📈 Investment</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveTransaction()">Save Record</button>
+            <button class="btn btn-danger hidden" id="btnDeleteTrans" onclick="deleteTransaction()">Delete</button>
         </div>
     </div>
 
-    <div class="modal" id="goalModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Set a Goal</h2>
-                <i class="fa-solid fa-xmark" style="font-size:1.5rem;" onclick="closeModal('goalModal')"></i>
+    <div class="modal-overlay" id="assetModal">
+        <div class="modal-sheet">
+            <div class="sheet-header">
+                <h3 id="assetModalTitle">Add Asset</h3>
+                <i class="fa-solid fa-times" onclick="closeModal('assetModal')" style="cursor:pointer;"></i>
             </div>
-            <input type="text" id="gName" class="input-box" placeholder="Goal Name" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <input type="number" id="gTarget" class="input-box" placeholder="Target Amount" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <input type="number" id="gCurrent" class="input-box" placeholder="Already Saved" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <p style="margin-top:10px; font-size:0.9rem;">Deadline:</p>
-            <input type="date" id="gDate" class="input-box" style="text-align:left; background:rgba(0,0,0,0.2);">
-            <button class="btn btn-primary" onclick="addGoal()">Create Goal</button>
+            <div class="input-group">
+                <label>Name</label>
+                <input type="text" id="aName" class="input-field" placeholder="e.g. Gold, Tesla Stock">
+            </div>
+            <div class="input-group">
+                <label>Current Value</label>
+                <input type="number" id="aValue" class="input-field" placeholder="0.00">
+            </div>
+            <div id="liabilityFields" class="hidden">
+                <div class="input-group">
+                    <label>Monthly EMI</label>
+                    <input type="number" id="aEmi" class="input-field" placeholder="0.00">
+                </div>
+                <div class="input-group">
+                    <label>Interest Rate (%)</label>
+                    <input type="number" id="aRate" class="input-field" placeholder="8.5">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveAsset()">Save</button>
         </div>
     </div>
 
 <script>
-    // --- STATE & STORE ---
-    let store = {
-        user: { name: '', currency: 'USD' },
+    // --- STATE & CONFIG ---
+    let data = {
+        currency: 'USD',
         transactions: [],
-        goals: []
+        assets: [], // {id, name, value, type: 'asset'}
+        liabilities: [] // {id, name, value, emi, rate, type: 'liability'}
     };
 
-    const currencyMap = { 'USD': '$', 'EUR': '€', 'INR': '₹', 'GBP': '£' };
+    let currentTransType = 'expense';
+    let editModeId = null;
+    let privacyMode = true; // Default stealthy
+    
+    const currencySym = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
 
     // --- INIT ---
     function init() {
-        const saved = localStorage.getItem('wealthflow_v2');
-        if (saved) {
-            store = JSON.parse(saved);
-            document.getElementById('onboarding').classList.add('hidden');
-            renderAll();
-        } else {
-            document.getElementById('onboarding').classList.remove('hidden');
-        }
-        setGreeting();
-    }
+        const stored = localStorage.getItem('zenwealth_db');
+        if(stored) data = JSON.parse(stored);
+        
+        // Apply Settings
+        document.getElementById('currencySelect').value = data.currency;
+        
+        // Initial privacy state
+        togglePrivacy(); // run once to set visuals (logic toggles it, so we call it to init)
+        togglePrivacy(); // flip back to intended default
 
-    function save() {
-        localStorage.setItem('wealthflow_v2', JSON.stringify(store));
         renderAll();
     }
 
-    // --- ONBOARDING ---
-    function completeOnboarding() {
-        const name = document.getElementById('setupName').value;
-        const curr = document.getElementById('setupCurrency').value;
-        if(name) {
-            store.user.name = name;
-            store.user.currency = curr;
-            save();
-            document.getElementById('onboarding').classList.add('hidden');
-        }
+    function saveData() {
+        localStorage.setItem('zenwealth_db', JSON.stringify(data));
+        renderAll();
     }
 
-    function setGreeting() {
-        const hour = new Date().getHours();
-        const greet = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
-        document.getElementById('greetingTime').innerText = greet;
-    }
-
-    // --- NAVIGATION ---
-    window.switchView = (viewId) => {
-        ['home', 'analytics', 'goals', 'settings'].forEach(id => {
-            document.getElementById(`view-${id}`).classList.add('hidden');
-        });
-        document.getElementById(`view-${viewId}`).classList.remove('hidden');
-        
-        // Update Nav Active State
-        document.querySelectorAll('.nav-item').forEach((el, index) => {
-            el.classList.remove('active');
-            if(['home', 'analytics', 'goals', 'settings'][index] === viewId) el.classList.add('active');
-        });
-
-        if(viewId === 'analytics') renderChart();
-    }
-
-    // --- CORE LOGIC ---
+    // --- LOGIC ENGINE ---
     function renderAll() {
-        document.getElementById('userNameDisplay').innerText = store.user.name;
-        const sym = currencyMap[store.user.currency];
-
-        // 1. Balance Logic
-        const income = store.transactions.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-        const expense = store.transactions.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-        const balance = income - expense;
+        const sym = currencySym[data.currency];
         
-        document.getElementById('totalBalance').innerText = `${sym}${balance.toLocaleString()}`;
+        // 1. Calculate Totals
+        const totalAssets = data.assets.reduce((a,b) => a + b.value, 0);
+        const totalLiabilities = data.liabilities.reduce((a,b) => a + b.value, 0);
         
-        // Month Logic
-        const currentMonth = new Date().getMonth();
-        const mTrans = store.transactions.filter(t => new Date(t.date).getMonth() === currentMonth);
-        const mInc = mTrans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
-        const mExp = mTrans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
+        // Liquid Cash (Income - Expense)
+        const income = data.transactions.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0);
+        const expense = data.transactions.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0);
+        const liquidCash = income - expense;
 
-        document.getElementById('monthIncome').innerText = `+${sym}${mInc.toLocaleString()}`;
-        document.getElementById('monthExpense').innerText = `-${sym}${mExp.toLocaleString()}`;
+        const netWorth = (liquidCash + totalAssets) - totalLiabilities;
 
-        // Runway Logic
-        const avgExp = mExp || expense || 1; // crude avg
-        const runway = (balance / avgExp).toFixed(1);
-        const runwayStr = balance > 0 ? `${runway} Months` : '0 Months';
-        document.getElementById('runwayText').innerText = `Runway: ${runwayStr}`;
-        document.getElementById('analyticsRunway').innerText = runwayStr;
+        // 2. Render Metrics
+        document.getElementById('netWorthDisplay').innerText = formatMoney(netWorth);
+        document.getElementById('liquidAssetDisplay').innerText = formatMoney(liquidCash);
+        document.getElementById('liabilityDisplay').innerText = formatMoney(totalLiabilities);
 
-        // Motivation Pill Logic
-        const pill = document.getElementById('motivationPill');
-        const pillText = document.getElementById('motivationText');
+        // 3. Financial Freedom (4% Rule)
+        // Est Annual Expense = Last 30 days expense * 12
+        const last30Expense = getLast30DaysExpense();
+        const annualExpense = last30Expense * 12;
+        const fireNumber = annualExpense * 25; 
         
-        if (mExp > mInc && mInc > 0) {
-            pill.className = "motivation-pill warning";
-            pillText.innerText = "Spending exceeds income. Caution.";
-        } else if ((mInc - mExp) / mInc > 0.2) {
-            pill.className = "motivation-pill";
-            pillText.innerText = "Excellent! You're saving >20%.";
+        const freedomPercent = fireNumber > 0 ? Math.min((netWorth / fireNumber) * 100, 100) : 0;
+        document.getElementById('freedomPercent').innerText = freedomPercent.toFixed(1) + '%';
+        document.getElementById('freedomBar').style.width = freedomPercent + '%';
+        document.getElementById('freedomTarget').innerText = formatMoney(fireNumber);
+
+        // 4. Runway
+        // Runway = Liquid Cash / Avg Monthly Expense
+        const avgExp = last30Expense || 1;
+        const runway = liquidCash / avgExp;
+        document.getElementById('runwayDisplay').innerText = liquidCash > 0 ? runway.toFixed(1) : '0';
+
+        // 5. Debt Snowball Estimate
+        const totalEMI = data.liabilities.reduce((a,b) => a + (b.emi || 0), 0);
+        if(totalLiabilities > 0 && totalEMI > 0) {
+            const monthsToFree = totalLiabilities / totalEMI;
+            document.getElementById('debtFreeDate').innerText = monthsToFree.toFixed(1) + " Months";
+        } else if (totalLiabilities === 0) {
+            document.getElementById('debtFreeDate').innerText = "Debt Free ✨";
         } else {
-            pill.className = "motivation-pill";
-            pillText.innerText = "Keep tracking every penny.";
+            document.getElementById('debtFreeDate').innerText = "N/A";
         }
 
-        renderTransactionsList(sym);
-        renderGoalsList(sym);
+        renderLists();
+        renderChart();
     }
 
-    function renderTransactionsList(sym) {
-        const list = document.getElementById('recentTransactions');
-        list.innerHTML = '';
-        store.transactions.slice().reverse().slice(0, 5).forEach(t => {
+    function getLast30DaysExpense() {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return data.transactions
+            .filter(t => t.type === 'expense' && new Date(t.date) >= thirtyDaysAgo)
+            .reduce((a,b) => a + b.amount, 0);
+    }
+
+    // --- LIST RENDERING ---
+    function renderLists() {
+        const sym = currencySym[data.currency];
+        
+        // Transactions
+        const tList = document.getElementById('recentList');
+        tList.innerHTML = '';
+        const sortedTrans = [...data.transactions].reverse().slice(0, 20); // Show last 20
+        
+        sortedTrans.forEach(t => {
             const el = document.createElement('div');
-            el.className = 'trans-item blur-sensitive';
+            el.className = 'list-item';
+            el.onclick = () => editTransaction(t.id);
             const isInc = t.type === 'income';
+            
             el.innerHTML = `
                 <div style="display:flex; align-items:center;">
-                    <div class="trans-icon" style="color: ${isInc ? 'var(--success)' : 'var(--danger)'}">
-                        <i class="fa-solid ${isInc ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                    <div class="icon-box" style="color:${isInc ? 'var(--success)' : 'var(--text-main)'}">
+                        <i class="fa-solid ${getCategoryIcon(t.category)}"></i>
                     </div>
-                    <div class="trans-info">
-                        <h4>${t.desc}</h4>
-                        <p>${new Date(t.date).toLocaleDateString()}</p>
+                    <div>
+                        <div style="font-weight:500;">${t.desc}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">${new Date(t.date).toLocaleDateString()}</div>
                     </div>
                 </div>
-                <div style="font-weight:600; color: ${isInc ? 'var(--success)' : 'var(--text)'}">
-                    ${isInc ? '+' : '-'}${sym}${t.amount}
+                <div class="blur-sensitive" style="font-weight:600; color:${isInc ? 'var(--success)' : 'var(--text-main)'}">
+                    ${isInc?'+':'-'}${sym}${t.amount.toLocaleString()}
                 </div>
             `;
-            list.appendChild(el);
+            tList.appendChild(el);
         });
-    }
 
-    function renderGoalsList(sym) {
-        const container = document.getElementById('goalsContainer');
-        container.innerHTML = '';
-        
-        store.goals.forEach(g => {
-            const percent = Math.min((g.current / g.target) * 100, 100).toFixed(1);
-            
-            // Reverse Calc
-            const daysLeft = Math.ceil((new Date(g.date) - new Date()) / (1000 * 60 * 60 * 24));
-            const needed = g.target - g.current;
-            let insight = "Goal Reached! 🎉";
-            if (needed > 0 && daysLeft > 0) {
-                insight = `Save <b>${sym}${(needed/daysLeft).toFixed(2)}</b> / day to hit this.`;
-            } else if (daysLeft <= 0 && needed > 0) {
-                insight = "Deadline passed.";
-            }
-
-            const el = document.createElement('div');
-            el.className = 'card goal-item';
-            el.innerHTML = `
-                <div class="goal-header">
-                    <span>${g.name}</span>
-                    <span class="blur-sensitive">${sym}${g.current} / ${sym}${g.target}</span>
+        // Assets
+        const aList = document.getElementById('assetList');
+        aList.innerHTML = '';
+        data.assets.forEach(a => {
+            aList.innerHTML += `
+                <div class="list-item">
+                     <div style="display:flex; align-items:center;">
+                        <div class="icon-box"><i class="fa-solid fa-coins"></i></div>
+                        <span>${a.name}</span>
+                    </div>
+                    <span class="blur-sensitive">${formatMoney(a.value)}</span>
                 </div>
-                <div class="progress-track">
-                    <div class="progress-fill" style="width: ${percent}%"></div>
-                </div>
-                <div class="goal-insight blur-sensitive">${insight}</div>
             `;
-            container.appendChild(el);
+        });
+
+        // Liabilities
+        const lList = document.getElementById('liabilityList');
+        lList.innerHTML = '';
+        data.liabilities.forEach(l => {
+            lList.innerHTML += `
+                <div class="list-item">
+                     <div style="display:flex; align-items:center;">
+                        <div class="icon-box" style="color:var(--danger)"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        <div>
+                            <div>${l.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi || 0)}</div>
+                        </div>
+                    </div>
+                    <span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span>
+                </div>
+            `;
         });
     }
 
     // --- ACTIONS ---
-    function addTransaction() {
-        const type = document.getElementById('tType').value;
-        const desc = document.getElementById('tDesc').value;
-        const amount = parseFloat(document.getElementById('tAmount').value);
+    
+    // Transactions
+    function openTransModal(id = null) {
+        document.getElementById('transModal').classList.add('active');
+        document.getElementById('btnDeleteTrans').classList.add('hidden');
+        document.getElementById('transModalTitle').innerText = "New Transaction";
+        document.getElementById('tDesc').value = '';
+        document.getElementById('tAmt').value = '';
+        editModeId = null;
+    }
+
+    function editTransaction(id) {
+        const t = data.transactions.find(x => x.id === id);
+        if(!t) return;
         
-        if(desc && amount) {
-            store.transactions.push({
+        openTransModal();
+        editModeId = id;
+        document.getElementById('transModalTitle').innerText = "Edit Transaction";
+        document.getElementById('tDesc').value = t.desc;
+        document.getElementById('tAmt').value = t.amount;
+        document.getElementById('tCat').value = t.category;
+        document.getElementById('btnDeleteTrans').classList.remove('hidden');
+        setTransType(t.type);
+    }
+
+    function saveTransaction() {
+        const desc = document.getElementById('tDesc').value;
+        const amount = parseFloat(document.getElementById('tAmt').value);
+        const cat = document.getElementById('tCat').value;
+        
+        if(!desc || !amount) return;
+
+        if (editModeId) {
+            // Update Existing
+            const index = data.transactions.findIndex(x => x.id === editModeId);
+            if(index !== -1) {
+                data.transactions[index] = { ...data.transactions[index], desc, amount, category: cat, type: currentTransType };
+            }
+        } else {
+            // Create New
+            data.transactions.push({
                 id: Date.now(),
-                type, desc, amount,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                desc, amount, category: cat, type: currentTransType
             });
-            save();
+        }
+        saveData();
+        closeModal('transModal');
+    }
+
+    function deleteTransaction() {
+        if(editModeId) {
+            data.transactions = data.transactions.filter(t => t.id !== editModeId);
+            saveData();
             closeModal('transModal');
-            document.getElementById('tDesc').value = '';
-            document.getElementById('tAmount').value = '';
         }
     }
 
-    function addGoal() {
-        const name = document.getElementById('gName').value;
-        const target = parseFloat(document.getElementById('gTarget').value);
-        const current = parseFloat(document.getElementById('gCurrent').value);
-        const date = document.getElementById('gDate').value;
+    function setTransType(type) {
+        currentTransType = type;
+        document.getElementById('tabExpense').classList.toggle('active', type === 'expense');
+        document.getElementById('tabIncome').classList.toggle('active', type === 'income');
+    }
 
-        if(name && target && date) {
-            store.goals.push({ id: Date.now(), name, target, current, date });
-            save();
-            closeModal('goalModal');
+    // Assets & Liabilities
+    let currentAssetType = 'asset';
+    function openAssetModal() {
+        currentAssetType = 'asset';
+        document.getElementById('assetModalTitle').innerText = "Add Investment/Asset";
+        document.getElementById('liabilityFields').classList.add('hidden');
+        document.getElementById('assetModal').classList.add('active');
+    }
+
+    function openLiabilityModal() {
+        currentAssetType = 'liability';
+        document.getElementById('assetModalTitle').innerText = "Add Loan/Liability";
+        document.getElementById('liabilityFields').classList.remove('hidden');
+        document.getElementById('assetModal').classList.add('active');
+    }
+
+    function saveAsset() {
+        const name = document.getElementById('aName').value;
+        const value = parseFloat(document.getElementById('aValue').value);
+        
+        if(name && value) {
+            if(currentAssetType === 'asset') {
+                data.assets.push({ id: Date.now(), name, value });
+            } else {
+                const emi = parseFloat(document.getElementById('aEmi').value) || 0;
+                const rate = parseFloat(document.getElementById('aRate').value) || 0;
+                data.liabilities.push({ id: Date.now(), name, value, emi, rate });
+            }
+            saveData();
+            closeModal('assetModal');
         }
     }
 
-    // --- CHARTS ---
+    // --- CHART ---
     let myChart;
     function renderChart() {
-        const ctx = document.getElementById('mainChart').getContext('2d');
+        const ctx = document.getElementById('cashflowChart').getContext('2d');
         if(myChart) myChart.destroy();
-        
-        // Simple data aggregation for MVP
-        const inc = store.transactions.filter(t => t.type === 'income').reduce((a,b)=>a+b.amount,0);
-        const exp = store.transactions.filter(t => t.type === 'expense').reduce((a,b)=>a+b.amount,0);
 
+        // Prepare Data (Last 6 Months)
+        const labels = [];
+        const incData = [];
+        const expData = [];
+        
+        for(let i=5; i>=0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const label = d.toLocaleString('default', { month: 'short' });
+            labels.push(label);
+            
+            const mTrans = data.transactions.filter(t => {
+                const td = new Date(t.date);
+                return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear();
+            });
+
+            incData.push(mTrans.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0));
+            expData.push(mTrans.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0));
+        }
+
+        Chart.defaults.color = '#737373';
         myChart = new Chart(ctx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
-                labels: ['Expenses', 'Savings/Surplus'],
-                datasets: [{
-                    data: [exp, inc > exp ? inc - exp : 0],
-                    backgroundColor: ['#ef4444', '#10b981'],
-                    borderWidth: 0
-                }]
+                labels: labels,
+                datasets: [
+                    { label: 'Income', data: incData, backgroundColor: '#10b981', borderRadius: 4 },
+                    { label: 'Expense', data: expData, backgroundColor: '#ef4444', borderRadius: 4 }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
                 }
             }
         });
     }
 
     // --- UTILS ---
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    
-    let privacy = false;
+    function formatMoney(amount) {
+        const sym = currencySym[data.currency];
+        return sym + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function getCategoryIcon(cat) {
+        const map = {
+            'Food': 'fa-utensils',
+            'Transport': 'fa-car',
+            'Shopping': 'fa-bag-shopping',
+            'Bills': 'fa-file-invoice',
+            'Salary': 'fa-money-bill-wave',
+            'Investment': 'fa-chart-line'
+        };
+        return map[cat] || 'fa-circle';
+    }
+
     function togglePrivacy() {
-        privacy = !privacy;
-        document.documentElement.style.setProperty('--blur', privacy ? '6px' : '0px');
-        document.getElementById('privacyToggle').className = privacy ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+        privacyMode = !privacyMode;
+        document.documentElement.style.setProperty('--blur', privacyMode ? '6px' : '0px');
+        document.getElementById('privacyBtn').classList.toggle('active', !privacyMode);
     }
 
-    function resetOnboarding() {
-        if(confirm('Change user details?')) {
-            document.getElementById('onboarding').classList.remove('hidden');
-        }
+    function switchView(view) {
+        document.querySelectorAll('main').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`view-${view}`).classList.remove('hidden');
+        document.querySelectorAll('.dock-item').forEach((el, idx) => {
+            el.classList.toggle('active', ['home', 'wealth', 'analytics', 'settings'][idx] === view);
+        });
+        if(view === 'analytics') renderChart();
     }
 
-    function hardReset() {
-        if(confirm('Delete ALL data permanently? This cannot be undone.')) {
-            localStorage.removeItem('wealthflow_v2');
-            location.reload();
-        }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function updateCurrency() {
+        data.currency = document.getElementById('currencySelect').value;
+        saveData();
     }
 
     function exportData() {
-        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
+        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
         const a = document.createElement('a');
-        a.href = str; a.download = 'wealthflow_backup.json';
+        a.href = str; a.download = 'zenwealth_backup.json';
         a.click();
+    }
+
+    function importData(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                data = JSON.parse(e.target.result);
+                saveData();
+                alert('Import Successful');
+                location.reload();
+            } catch(e) { alert('Invalid File'); }
+        };
+        reader.readAsText(file);
+    }
+
+    function hardReset() {
+        if(confirm("Permanently delete all data?")) {
+            localStorage.removeItem('zenwealth_db');
+            location.reload();
+        }
     }
 
     // Start
