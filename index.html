@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZenWealth | Obsidian</title>
+    <title>ZenWealth | Obsidian Ultimate</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
             --text-main: #ffffff;
             --text-muted: #888888;
             
-            /* Accents - Monochrome & Stealth */
+            /* Accents */
             --accent: #ffffff; 
             --accent-dim: rgba(255, 255, 255, 0.1);
             --success: #00ff9d; /* Cyber Green */
@@ -65,6 +65,15 @@
         .metric-val { font-size: 2rem; font-weight: 600; letter-spacing: -1px; color: var(--text-main); }
         .metric-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
 
+        /* --- AI ASSISTANT --- */
+        .ai-banner {
+            background: var(--surface-2); border: 1px solid var(--border); border-left: 2px solid #fff;
+            padding: 15px; border-radius: var(--radius); margin-bottom: 20px;
+            display: flex; gap: 12px; align-items: flex-start;
+        }
+        .ai-icon { color: #fff; font-size: 1.1rem; margin-top: 2px; }
+        .ai-text { font-size: 0.85rem; line-height: 1.4; color: #ccc; }
+
         /* --- LISTS --- */
         .list-header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 15px; }
         .list-header h3 { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -73,6 +82,11 @@
         .item-row:last-child { border-bottom: none; }
         .item-icon { width: 36px; height: 36px; border-radius: 4px; background: var(--surface-2); display: flex; justify-content: center; align-items: center; margin-right: 12px; color: var(--text-main); font-size: 0.9rem; }
         
+        /* --- GOALS --- */
+        .goal-progress-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+        .goal-progress-fill { height: 100%; background: #fff; width: 0%; }
+        .goal-insight { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+
         /* --- CALENDAR --- */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 15px; }
         .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--surface-2); font-size: 0.8rem; cursor: pointer; border-radius: 4px; position: relative; color: var(--text-muted); }
@@ -104,7 +118,7 @@
         /* --- MODALS --- */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.2s; }
         .modal.active { opacity: 1; pointer-events: all; }
-        .modal-sheet { background: #0f0f0f; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0; padding: 30px 20px; border-top: 1px solid var(--border); transform: translateY(100%); transition: 0.3s; }
+        .modal-sheet { background: #0f0f0f; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0; padding: 30px 20px; border-top: 1px solid var(--border); transform: translateY(100%); transition: 0.3s; max-height: 90vh; overflow-y: auto; }
         .modal.active .modal-sheet { transform: translateY(0); }
         
         .input-group { margin-bottom: 15px; }
@@ -112,7 +126,6 @@
         .input-field { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 14px; border-radius: var(--radius); font-size: 0.95rem; outline: none; }
         .input-field:focus { border-color: #fff; }
 
-        /* Checkbox for Recurring */
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 10px; background: var(--surface-2); border-radius: var(--radius); }
         .checkbox-wrapper input { width: 18px; height: 18px; accent-color: #fff; }
         
@@ -127,10 +140,6 @@
         .chart-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
         .chart-tab { padding: 6px 12px; background: var(--surface-2); border-radius: 4px; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; border: 1px solid transparent; }
         .chart-tab.active { background: #fff; color: #000; }
-        
-        /* Progress Bar */
-        .progress-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #fff; width: 0%; }
         
         #onboarding { position: fixed; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; }
 
@@ -162,6 +171,11 @@
 
     <main id="view-home" class="fade-in">
         
+        <div class="ai-banner">
+            <i class="fa-solid fa-robot ai-icon"></i>
+            <div class="ai-text" id="aiMotivation">Initializing financial analysis...</div>
+        </div>
+
         <div class="card">
             <div class="metric-title">Net Worth</div>
             <div class="metric-val blur-sensitive" id="netWorth">$0.00</div>
@@ -180,11 +194,16 @@
                 </div>
             </div>
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
-                <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom: 5px;">FREE DISPOSABLE CASH (SAVINGS)</div>
+                <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom: 5px;">FREE DISPOSABLE CASH</div>
                 <div class="blur-sensitive" style="font-size:1.4rem; font-weight: 600;" id="flowFree">$0</div>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top:5px;">Income - (Fixed Expenses + Loans)</div>
             </div>
         </div>
+
+        <div class="list-header">
+            <h3>Active Goals</h3>
+            <i class="fa-solid fa-plus" style="cursor:pointer; color:var(--text-muted);" onclick="openGoalModal()"></i>
+        </div>
+        <div id="homeGoalsList"></div>
 
         <div class="list-header">
             <h3>Recent Activity</h3>
@@ -195,6 +214,12 @@
 
     <main id="view-wealth" class="hidden fade-in">
         
+        <div class="card" style="border-color: #500; background: #1a0505;">
+            <div class="metric-title" style="color:var(--danger);">Debt Freedom Estimate</div>
+            <div class="metric-val" id="debtFreeTime" style="font-size:1.5rem;">Calculating...</div>
+            <div class="metric-sub" id="debtFreeSub">Based on Total EMIs</div>
+        </div>
+
         <div class="list-header" style="margin-top: 10px;">
             <h3 style="color:var(--success)">Assets</h3>
             <i class="fa-solid fa-plus" style="cursor:pointer;" onclick="openAssetModal('asset')"></i>
@@ -327,10 +352,6 @@
                 <input type="checkbox" id="tFixed">
                 <label for="tFixed" style="font-size:0.9rem; color:#fff;">Fixed Monthly? (e.g. Rent, OTT)</label>
             </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:15px; margin-top:-10px;">
-                If checked, this amount is deducted from income to calculate 'Free Cash'.
-            </div>
-
             <div class="input-group">
                 <input type="date" id="tDate" class="input-field">
             </div>
@@ -338,6 +359,32 @@
             <button class="btn btn-primary" onclick="saveTransaction()">SAVE</button>
             <button class="btn btn-danger hidden" id="btnDelTrans" onclick="deleteItem('transaction')">DELETE</button>
             <button class="btn btn-text" onclick="closeModal('modalTrans')">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalGoal">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom:20px; text-transform:uppercase;">Short Term Goal</h3>
+            <input type="hidden" id="gId">
+            <div class="input-group">
+                <label class="input-label">Goal Name</label>
+                <input type="text" id="gName" class="input-field" placeholder="e.g. New Phone">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Target Amount</label>
+                <input type="number" id="gTarget" class="input-field" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Saved So Far</label>
+                <input type="number" id="gSaved" class="input-field" placeholder="0">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Target Date</label>
+                <input type="date" id="gDate" class="input-field">
+            </div>
+            <button class="btn btn-primary" onclick="saveGoal()">SAVE GOAL</button>
+            <button class="btn btn-danger hidden" id="btnDelGoal" onclick="deleteItem('goal')">DELETE</button>
+            <button class="btn btn-text" onclick="closeModal('modalGoal')">CANCEL</button>
         </div>
     </div>
 
@@ -376,16 +423,16 @@
     </div>
 
 <script>
-    let db = { user: { name: '', currency: 'USD' }, transactions: [], assets: [], liabilities: [] };
+    let db = { user: { name: '', currency: 'USD' }, transactions: [], assets: [], liabilities: [], goals: [] };
     let state = { view: 'home', privacy: false, transType: 'expense', editId: null, calDate: new Date(), chartType: 'bar' };
     const currencyMap = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
 
     function init() {
-        const stored = localStorage.getItem('zenwealth_obsidian');
+        const stored = localStorage.getItem('zenwealth_obsidian_ult');
         if(stored) { db = JSON.parse(stored); document.getElementById('onboarding').classList.add('hidden'); renderAll(); } 
         else { document.getElementById('onboarding').classList.remove('hidden'); }
     }
-    function saveDB() { localStorage.setItem('zenwealth_obsidian', JSON.stringify(db)); renderAll(); }
+    function saveDB() { localStorage.setItem('zenwealth_obsidian_ult', JSON.stringify(db)); renderAll(); }
     function completeOnboarding() {
         db.user.name = document.getElementById('setupName').value;
         db.user.currency = document.getElementById('setupCurrency').value;
@@ -398,47 +445,63 @@
         document.getElementById('settingName').value = db.user.name;
         document.getElementById('settingCurrency').value = db.user.currency;
 
-        // Metrics
         const totalAssets = db.assets.reduce((a,b)=>a+(b.value||0),0);
         const totalLiabilities = db.liabilities.reduce((a,b)=>a+(b.value||0),0);
         
-        // Month Logic
+        // Month Data
         const d = new Date();
         const mTrans = db.transactions.filter(t => new Date(t.date).getMonth() === d.getMonth() && new Date(t.date).getFullYear() === d.getFullYear());
-        
         const mInc = mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
-        // All expenses
         const mExp = mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
         
-        // FIXED EXPENSES LOGIC (User Request)
-        // Sum of transactions marked "Fixed" + Sum of all Liability EMIs
+        // Fixed & Free Cash Logic
         const fixedTrans = mTrans.filter(t => t.type === 'expense' && t.isFixed).reduce((a,b)=>a+b.amount,0);
         const totalEMIs = db.liabilities.reduce((a,b) => a+(b.emi||0), 0);
         const totalFixedMonthly = fixedTrans + totalEMIs;
         const freeCash = mInc - totalFixedMonthly;
 
-        // Net Worth
         const allInc = db.transactions.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
         const allExp = db.transactions.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
         const liquid = allInc - allExp;
         const netWorth = (liquid + totalAssets) - totalLiabilities;
 
+        // --- UI UPDATES ---
         document.getElementById('netWorth').innerText = formatMoney(netWorth);
-        
-        // Cash Flow Card
         document.getElementById('flowIncome').innerText = `+${formatMoney(mInc)}`;
         document.getElementById('flowFixed').innerText = `-${formatMoney(totalFixedMonthly)}`;
         document.getElementById('flowFree').innerText = formatMoney(freeCash);
         document.getElementById('flowFree').style.color = freeCash >= 0 ? 'var(--success)' : 'var(--danger)';
-
-        // Wealth
         document.getElementById('totalAssetVal').innerText = formatMoney(totalAssets);
         document.getElementById('totalLiabVal').innerText = formatMoney(totalLiabilities);
-
-        // Runway
+        
         const avgExp = mExp || 1;
         const runway = liquid > 0 ? (liquid/avgExp).toFixed(1) : '0';
         document.getElementById('runwayVal').innerText = runway;
+
+        // --- DEBT FREEDOM ESTIMATOR ---
+        const debtTime = document.getElementById('debtFreeTime');
+        const debtSub = document.getElementById('debtFreeSub');
+        if (totalLiabilities <= 0) {
+            debtTime.innerText = "DEBT FREE";
+            debtSub.innerText = "You have no liabilities.";
+        } else if (totalEMIs > 0) {
+            const months = Math.ceil(totalLiabilities / totalEMIs);
+            const yrs = Math.floor(months / 12);
+            const m = months % 12;
+            debtTime.innerText = `${yrs}y ${m}m`;
+            debtSub.innerText = `Based on total EMI: ${formatMoney(totalEMIs)}/mo`;
+        } else {
+            debtTime.innerText = "ADD EMI";
+            debtSub.innerText = "Edit liabilities to add EMI info";
+        }
+
+        // --- AI ASSISTANT LOGIC ---
+        const aiText = document.getElementById('aiMotivation');
+        const rate = mInc > 0 ? ((mInc - mExp)/mInc)*100 : 0;
+        if (freeCash < 0) aiText.innerText = "⚠️ Critical: Your fixed expenses exceed your income. Reduce liabilities immediately.";
+        else if (mExp > mInc) aiText.innerText = "Warning: Spending exceeds income this month. Review non-essential costs.";
+        else if (rate > 20) aiText.innerText = `Excellent. Saving ${rate.toFixed(0)}%. Consider investing the surplus in assets.`;
+        else aiText.innerText = "Stable. Try to increase your savings rate to 20% for faster financial freedom.";
 
         renderLists();
         renderCalendar();
@@ -447,280 +510,145 @@
 
     function renderLists() {
         const sym = currencyMap[db.user.currency];
-        const tList = document.getElementById('homeTransList');
-        tList.innerHTML = '';
         
-        const sorted = [...db.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0, 8);
-        if(sorted.length === 0) tList.innerHTML = '<div style="text-align:center; padding:15px; color:#333; font-size:0.8rem;">NO ACTIVITY</div>';
+        // Goals
+        const gList = document.getElementById('homeGoalsList'); gList.innerHTML = '';
+        if(db.goals && db.goals.length > 0) {
+            db.goals.forEach(g => {
+                const pct = Math.min((g.saved/g.target)*100, 100);
+                const days = Math.ceil((new Date(g.date) - new Date())/(86400000));
+                const needed = g.target - g.saved;
+                let msg = days > 0 && needed > 0 ? `Save ${formatMoney(needed/days)}/day` : (needed<=0 ? "COMPLETED" : "OVERDUE");
+                
+                gList.innerHTML += `
+                <div class="card" style="padding:15px; margin-bottom:10px;" onclick="editGoal(${g.id})">
+                    <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                        <span>${g.name}</span>
+                        <span class="blur-sensitive">${formatMoney(g.saved)} / ${formatMoney(g.target)}</span>
+                    </div>
+                    <div class="goal-progress-bg"><div class="goal-progress-fill" style="width:${pct}%"></div></div>
+                    <div class="goal-insight">${msg}</div>
+                </div>`;
+            });
+        } else {
+            gList.innerHTML = '<div style="text-align:center; padding:10px; color:#333; font-size:0.8rem;">NO ACTIVE GOALS</div>';
+        }
 
+        // Transactions
+        const tList = document.getElementById('homeTransList'); tList.innerHTML = '';
+        const sorted = [...db.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0, 5);
+        if(sorted.length === 0) tList.innerHTML = '<div style="text-align:center; padding:15px; color:#333; font-size:0.8rem;">NO ACTIVITY</div>';
         sorted.forEach(t => {
             const isInc = t.type === 'income';
             tList.innerHTML += `
             <div class="item-row" onclick="editTransaction(${t.id})">
                 <div style="display:flex; align-items:center;">
-                    <div class="item-icon" style="color:${isInc ? 'var(--success)' : '#fff'}">
-                        <i class="fa-solid ${getIcon(t.cat)}"></i>
-                    </div>
-                    <div>
-                        <div style="font-size:0.9rem; color:#fff;">${t.desc}</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(t.date).toLocaleDateString()} ${t.isFixed ? '• Fixed' : ''}</div>
-                    </div>
+                    <div class="item-icon" style="color:${isInc ? 'var(--success)' : '#fff'}"><i class="fa-solid ${getIcon(t.cat)}"></i></div>
+                    <div><div style="font-size:0.9rem; color:#fff;">${t.desc}</div><div style="font-size:0.7rem; color:var(--text-muted);">${new Date(t.date).toLocaleDateString()} ${t.isFixed ? '• Fixed' : ''}</div></div>
                 </div>
-                <div class="blur-sensitive" style="color:${isInc?'var(--success)':'#fff'}">
-                    ${isInc?'+':'-'}${formatMoney(t.amount)}
-                </div>
+                <div class="blur-sensitive" style="color:${isInc?'var(--success)':'#fff'}">${isInc?'+':'-'}${formatMoney(t.amount)}</div>
             </div>`;
         });
 
-        // Assets List
+        // Assets & Liabilities Lists (Same as before)
         const aList = document.getElementById('listAssets'); aList.innerHTML = '';
         db.assets.forEach(a => {
-            aList.innerHTML += `
-            <div class="item-row" onclick="editAsset('asset', ${a.id})">
-                <div style="display:flex; align-items:center;">
-                    <div class="item-icon"><i class="fa-solid fa-gem"></i></div>
-                    <span style="color:#fff;">${a.name}</span>
-                </div>
-                <span class="blur-sensitive">${formatMoney(a.value)}</span>
-            </div>`;
+            aList.innerHTML += `<div class="item-row" onclick="editAsset('asset', ${a.id})"><div style="display:flex; align-items:center;"><div class="item-icon"><i class="fa-solid fa-gem"></i></div><span style="color:#fff;">${a.name}</span></div><span class="blur-sensitive">${formatMoney(a.value)}</span></div>`;
         });
-
-        // Liabilities List
         const lList = document.getElementById('listLiabilities'); lList.innerHTML = '';
         db.liabilities.forEach(l => {
-            lList.innerHTML += `
-            <div class="item-row" onclick="editAsset('liability', ${l.id})">
-                <div style="display:flex; align-items:center;">
-                    <div class="item-icon" style="color:var(--danger)"><i class="fa-solid fa-file-invoice"></i></div>
-                    <div>
-                        <div style="color:#fff;">${l.name}</div>
-                        <div style="font-size:0.7rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi||0)} • ${l.rate||0}% Int</div>
-                    </div>
-                </div>
-                <span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span>
-            </div>`;
+            lList.innerHTML += `<div class="item-row" onclick="editAsset('liability', ${l.id})"><div style="display:flex; align-items:center;"><div class="item-icon" style="color:var(--danger)"><i class="fa-solid fa-file-invoice"></i></div><div><div style="color:#fff;">${l.name}</div><div style="font-size:0.7rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi||0)} • ${l.rate||0}% Int</div></div></div><span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span></div>`;
         });
     }
 
-    // --- CALENDAR LOGIC ---
+    // --- GOAL ACTIONS ---
+    function openGoalModal() {
+        state.editId = null;
+        document.getElementById('modalGoal').querySelectorAll('input').forEach(i=>i.value='');
+        document.getElementById('btnDelGoal').classList.add('hidden');
+        document.getElementById('modalGoal').classList.add('active');
+    }
+    function editGoal(id) {
+        state.editId = id;
+        const g = db.goals.find(x=>x.id===id);
+        document.getElementById('gName').value = g.name;
+        document.getElementById('gTarget').value = g.target;
+        document.getElementById('gSaved').value = g.saved;
+        document.getElementById('gDate').value = g.date;
+        document.getElementById('btnDelGoal').classList.remove('hidden');
+        document.getElementById('modalGoal').classList.add('active');
+    }
+    function saveGoal() {
+        const name = document.getElementById('gName').value;
+        const target = parseFloat(document.getElementById('gTarget').value);
+        const saved = parseFloat(document.getElementById('gSaved').value);
+        const date = document.getElementById('gDate').value;
+        if(name && target) {
+            const g = { id: state.editId || Date.now(), name, target, saved, date };
+            if(!db.goals) db.goals = [];
+            if(state.editId) { db.goals[db.goals.findIndex(x=>x.id===state.editId)] = g; } else { db.goals.push(g); }
+            saveDB(); closeModal('modalGoal');
+        }
+    }
+
+    // --- OTHER ACTIONS (Trans, Asset, Cal) same as previous ---
     let selectedDateStr = new Date().toISOString().split('T')[0];
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
         const y = state.calDate.getFullYear(), m = state.calDate.getMonth();
         document.getElementById('calMonthYear').innerText = new Date(y, m).toLocaleString('default', { month: 'long', year: 'numeric' });
-        
         const firstDay = new Date(y, m, 1).getDay();
         const daysInMonth = new Date(y, m+1, 0).getDate();
         const todayStr = new Date().toISOString().split('T')[0];
-
         for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
         for(let d=1; d<=daysInMonth; d++) {
             const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const hasEvent = db.transactions.some(t => t.date === dateStr);
             const isToday = dateStr === todayStr;
-            
-            const el = document.createElement('div');
-            el.className = `cal-day ${isToday?'today':''} ${hasEvent?'has-event':''}`;
-            el.innerText = d;
-            el.onclick = () => openDayPopup(dateStr);
-            grid.appendChild(el);
+            const el = document.createElement('div'); el.className = `cal-day ${isToday?'today':''} ${hasEvent?'has-event':''}`;
+            el.innerText = d; el.onclick = () => openDayPopup(dateStr); grid.appendChild(el);
         }
     }
-    
     function changeMonth(dir) { state.calDate.setMonth(state.calDate.getMonth() + dir); renderCalendar(); }
-
     function openDayPopup(dateStr) {
         selectedDateStr = dateStr;
         const dayTrans = db.transactions.filter(t => t.date === dateStr);
         document.getElementById('calPopupDate').innerText = new Date(dateStr).toDateString().toUpperCase();
-        
         let html = '';
         if(dayTrans.length === 0) html = '<div style="text-align:center; color:#555; font-size:0.8rem;">NO EVENTS</div>';
-        else {
-            dayTrans.forEach(t => {
-                const isInc = t.type === 'income';
-                html += `
-                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:0.9rem;">
-                    <span>${t.desc}</span>
-                    <span style="color:${isInc ? 'var(--success)' : '#fff'}">${isInc?'+':'-'}${formatMoney(t.amount)}</span>
-                </div>`;
-            });
-        }
+        else { dayTrans.forEach(t => { html += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #333; font-size:0.9rem;"><span>${t.desc}</span><span style="color:${t.type==='income'?'var(--success)':'#fff'}">${t.type==='income'?'+':'-'}${formatMoney(t.amount)}</span></div>`; }); }
         document.getElementById('calPopupContent').innerHTML = html;
-        document.getElementById('calOverlay').classList.remove('hidden');
-        document.getElementById('calPopup').classList.remove('hidden');
+        document.getElementById('calOverlay').classList.remove('hidden'); document.getElementById('calPopup').classList.remove('hidden');
     }
-    function closeCalPopup() { 
-        document.getElementById('calOverlay').classList.add('hidden'); 
-        document.getElementById('calPopup').classList.add('hidden'); 
-    }
-    function addTransFromCal() {
-        closeCalPopup();
-        openTransModal();
-        document.getElementById('tDate').value = selectedDateStr;
-    }
+    function closeCalPopup() { document.getElementById('calOverlay').classList.add('hidden'); document.getElementById('calPopup').classList.add('hidden'); }
+    function addTransFromCal() { closeCalPopup(); openTransModal(); document.getElementById('tDate').value = selectedDateStr; }
 
-    // --- ACTIONS ---
-    function openTransModal() {
-        resetModal('modalTrans');
-        state.editId = null;
-        document.getElementById('tDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('btnDelTrans').classList.add('hidden');
-        setTransType('expense'); // Default to Expense per request
-        document.getElementById('modalTrans').classList.add('active');
-    }
-
-    function editTransaction(id) {
-        state.editId = id;
-        const t = db.transactions.find(x => x.id === id);
-        document.getElementById('modalTrans').classList.add('active');
-        document.getElementById('tDesc').value = t.desc;
-        document.getElementById('tAmt').value = t.amount;
-        document.getElementById('tDate').value = t.date;
-        document.getElementById('tCat').value = t.cat;
-        document.getElementById('tFixed').checked = t.isFixed || false;
-        document.getElementById('btnDelTrans').classList.remove('hidden');
-        setTransType(t.type);
-    }
-
-    function saveTransaction() {
-        const desc = document.getElementById('tDesc').value;
-        const amount = parseFloat(document.getElementById('tAmt').value);
-        const cat = document.getElementById('tCat').value;
-        const date = document.getElementById('tDate').value;
-        const isFixed = document.getElementById('tFixed').checked;
-
-        if(desc && amount && date) {
-            const t = { id: state.editId || Date.now(), type: state.transType, desc, amount, cat, date, isFixed };
-            if(state.editId) { const idx = db.transactions.findIndex(x=>x.id===state.editId); db.transactions[idx] = t; } 
-            else { db.transactions.push(t); }
-            saveDB(); closeModal('modalTrans');
-        }
-    }
-
-    function openAssetModal(type, id=null) {
-        state.editId = id;
-        document.getElementById('aType').value = type;
-        document.getElementById('assetTitle').innerText = type === 'asset' ? 'ADD ASSET' : 'ADD LIABILITY';
-        document.getElementById('liabilityFields').classList.toggle('hidden', type === 'asset');
-        document.getElementById('btnDelAsset').classList.toggle('hidden', !id);
-        
-        if(id) {
-            const item = (type === 'asset' ? db.assets : db.liabilities).find(x=>x.id===id);
-            document.getElementById('aName').value = item.name;
-            document.getElementById('aValue').value = item.value;
-            if(type==='liability') {
-                document.getElementById('aEmi').value = item.emi;
-                document.getElementById('aRate').value = item.rate;
-            }
-        } else { resetModal('modalAsset'); }
-        document.getElementById('modalAsset').classList.add('active');
-    }
-
-    function saveAsset() {
-        const type = document.getElementById('aType').value;
-        const name = document.getElementById('aName').value;
-        const value = parseFloat(document.getElementById('aValue').value);
-        if(name && value) {
-            let item = { id: state.editId || Date.now(), name, value };
-            if(type === 'liability') {
-                item.emi = parseFloat(document.getElementById('aEmi').value) || 0;
-                item.rate = parseFloat(document.getElementById('aRate').value) || 0;
-            }
-            const list = type === 'asset' ? db.assets : db.liabilities;
-            if(state.editId) { list[list.findIndex(x=>x.id===state.editId)] = item; } 
-            else { list.push(item); }
-            saveDB(); closeModal('modalAsset');
-        }
-    }
-
-    // --- CHART ---
-    let myChart;
-    function renderChart() {
-        const ctx = document.getElementById('mainChart').getContext('2d');
-        if(myChart) myChart.destroy();
-        
-        // Group by Month (Last 6)
-        const labels = [], incD = [], expD = [];
-        for(let i=5; i>=0; i--) {
-            const d = new Date(); d.setMonth(d.getMonth() - i);
-            labels.push(d.toLocaleString('default',{month:'short'}));
-            const mTrans = db.transactions.filter(t => {
-                const td = new Date(t.date); return td.getMonth()===d.getMonth() && td.getFullYear()===d.getFullYear();
-            });
-            incD.push(mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0));
-            expD.push(mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0));
-        }
-
-        Chart.defaults.color = '#555';
-        myChart = new Chart(ctx, {
-            type: state.chartType,
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Income', data: incD, backgroundColor: '#00ff9d', borderColor: '#00ff9d', tension:0.3 },
-                    { label: 'Expense', data: expD, backgroundColor: '#ff4d4d', borderColor: '#ff4d4d', tension:0.3 }
-                ]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                scales: { x: { grid: { display: false } }, y: { grid: { color: '#222' } } },
-                plugins: { legend: { labels: { color: '#888' } } }
-            }
-        });
-    }
-
-    // --- UTILS ---
-    function setTransType(t) {
-        state.transType = t;
-        document.getElementById('btnExp').style.background = t==='expense' ? 'var(--danger)' : 'var(--surface-2)';
-        document.getElementById('btnInc').style.background = t==='income' ? 'var(--success)' : 'var(--surface-2)';
-    }
-    function switchView(v) {
-        state.view = v;
-        document.querySelectorAll('main').forEach(m => m.classList.add('hidden'));
-        document.getElementById(`view-${v}`).classList.remove('hidden');
-        document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
-        const idx = ['home','wealth','analytics','planner','settings'].indexOf(v);
-        document.querySelectorAll('.dock-item')[idx].classList.add('active');
-        renderAll();
-    }
-    function togglePrivacy() {
-        state.privacy = !state.privacy;
-        document.documentElement.style.setProperty('--blur', state.privacy ? '5px' : '0px');
-        document.getElementById('privacyToggle').classList.toggle('active', state.privacy);
-    }
-    function formatMoney(n) { return (currencyMap[db.user.currency] || '$') + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
-    function getIcon(c) {
-        const map = { 'Food':'fa-utensils', 'Transport':'fa-car', 'Shopping':'fa-bag-shopping', 'Bills':'fa-file-invoice', 'Salary':'fa-money-bill-wave' };
-        return map[c] || 'fa-tag';
-    }
-    function deleteItem(type) {
-        if(!confirm("Delete this item?")) return;
-        if(type==='transaction') db.transactions = db.transactions.filter(x=>x.id!==state.editId);
-        else { db.assets = db.assets.filter(x=>x.id!==state.editId); db.liabilities = db.liabilities.filter(x=>x.id!==state.editId); }
-        saveDB(); document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-    }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    function resetModal(id) { document.getElementById(id).querySelectorAll('input').forEach(i=>i.value=''); if(id==='modalTrans') document.getElementById('tFixed').checked=false; }
+    function openTransModal() { document.getElementById('modalTrans').querySelectorAll('input').forEach(i=>i.value=''); document.getElementById('tFixed').checked=false; state.editId = null; document.getElementById('tDate').value = new Date().toISOString().split('T')[0]; document.getElementById('btnDelTrans').classList.add('hidden'); setTransType('expense'); document.getElementById('modalTrans').classList.add('active'); }
+    function editTransaction(id) { state.editId = id; const t = db.transactions.find(x => x.id === id); document.getElementById('modalTrans').classList.add('active'); document.getElementById('tDesc').value = t.desc; document.getElementById('tAmt').value = t.amount; document.getElementById('tDate').value = t.date; document.getElementById('tCat').value = t.cat; document.getElementById('tFixed').checked = t.isFixed || false; document.getElementById('btnDelTrans').classList.remove('hidden'); setTransType(t.type); }
+    function saveTransaction() { const desc = document.getElementById('tDesc').value; const amount = parseFloat(document.getElementById('tAmt').value); const cat = document.getElementById('tCat').value; const date = document.getElementById('tDate').value; const isFixed = document.getElementById('tFixed').checked; if(desc && amount && date) { const t = { id: state.editId || Date.now(), type: state.transType, desc, amount, cat, date, isFixed }; if(state.editId) { db.transactions[db.transactions.findIndex(x=>x.id===state.editId)] = t; } else { db.transactions.push(t); } saveDB(); closeModal('modalTrans'); } }
     
-    // Settings & Export
-    function updateSettings() {
-        db.user.name = document.getElementById('settingName').value;
-        db.user.currency = document.getElementById('settingCurrency').value;
-        saveDB();
-    }
-    function exportData() {
-        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
-        const a = document.createElement('a'); a.href = str; a.download = 'zenwealth_obsidian.json'; a.click();
-    }
-    function importData(input) {
-        const reader = new FileReader();
-        reader.onload = (e) => { db = JSON.parse(e.target.result); saveDB(); alert('Restored!'); };
-        reader.readAsText(input.files[0]);
-    }
-    function hardReset() { if(confirm("Permanently Delete All Data?")) { localStorage.removeItem('zenwealth_obsidian'); location.reload(); } }
+    function openAssetModal(type, id=null) { state.editId = id; document.getElementById('aType').value = type; document.getElementById('assetTitle').innerText = type === 'asset' ? 'ADD ASSET' : 'ADD LIABILITY'; document.getElementById('liabilityFields').classList.toggle('hidden', type === 'asset'); document.getElementById('btnDelAsset').classList.toggle('hidden', !id); if(id) { const item = (type === 'asset' ? db.assets : db.liabilities).find(x=>x.id===id); document.getElementById('aName').value = item.name; document.getElementById('aValue').value = item.value; if(type==='liability') { document.getElementById('aEmi').value = item.emi; document.getElementById('aRate').value = item.rate; } } else { document.getElementById('modalAsset').querySelectorAll('input').forEach(i=>i.value=''); } document.getElementById('modalAsset').classList.add('active'); }
+    function saveAsset() { const type = document.getElementById('aType').value; const name = document.getElementById('aName').value; const value = parseFloat(document.getElementById('aValue').value); if(name && value) { let item = { id: state.editId || Date.now(), name, value }; if(type === 'liability') { item.emi = parseFloat(document.getElementById('aEmi').value) || 0; item.rate = parseFloat(document.getElementById('aRate').value) || 0; } const list = type === 'asset' ? db.assets : db.liabilities; if(state.editId) { list[list.findIndex(x=>x.id===state.editId)] = item; } else { list.push(item); } saveDB(); closeModal('modalAsset'); } }
+
+    function deleteItem(type) { if(!confirm("Delete item?")) return; if(type==='transaction') db.transactions = db.transactions.filter(x=>x.id!==state.editId); else if(type==='goal') db.goals = db.goals.filter(x=>x.id!==state.editId); else { db.assets = db.assets.filter(x=>x.id!==state.editId); db.liabilities = db.liabilities.filter(x=>x.id!==state.editId); } saveDB(); document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
+    
+    // UTILS
+    function setTransType(t) { state.transType = t; document.getElementById('btnExp').style.background = t==='expense' ? 'var(--danger)' : 'var(--surface-2)'; document.getElementById('btnInc').style.background = t==='income' ? 'var(--success)' : 'var(--surface-2)'; }
+    function switchView(v) { state.view = v; document.querySelectorAll('main').forEach(m => m.classList.add('hidden')); document.getElementById(`view-${v}`).classList.remove('hidden'); document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active')); const idx = ['home','wealth','analytics','planner','settings'].indexOf(v); document.querySelectorAll('.dock-item')[idx].classList.add('active'); renderAll(); }
+    function togglePrivacy() { state.privacy = !state.privacy; document.documentElement.style.setProperty('--blur', state.privacy ? '5px' : '0px'); document.getElementById('privacyToggle').classList.toggle('active', state.privacy); }
+    function formatMoney(n) { return (currencyMap[db.user.currency] || '$') + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    function getIcon(c) { const map = { 'Food':'fa-utensils', 'Transport':'fa-car', 'Shopping':'fa-bag-shopping', 'Bills':'fa-file-invoice', 'Salary':'fa-money-bill-wave' }; return map[c] || 'fa-tag'; }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    
+    // Chart
+    let myChart;
+    function renderChart() { const ctx = document.getElementById('mainChart').getContext('2d'); if(myChart) myChart.destroy(); const labels = [], incD = [], expD = []; for(let i=5; i>=0; i--) { const d = new Date(); d.setMonth(d.getMonth() - i); labels.push(d.toLocaleString('default',{month:'short'})); const mTrans = db.transactions.filter(t => { const td = new Date(t.date); return td.getMonth()===d.getMonth() && td.getFullYear()===d.getFullYear(); }); incD.push(mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0)); expD.push(mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0)); } Chart.defaults.color = '#555'; myChart = new Chart(ctx, { type: state.chartType, data: { labels: labels, datasets: [ { label: 'Income', data: incD, backgroundColor: '#00ff9d', borderColor: '#00ff9d', tension:0.3 }, { label: 'Expense', data: expD, backgroundColor: '#ff4d4d', borderColor: '#ff4d4d', tension:0.3 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: '#222' } } }, plugins: { legend: { labels: { color: '#888' } } } } }); }
     function setChartType(t,el) { state.chartType=t; document.querySelectorAll('.chart-tab').forEach(e=>e.classList.remove('active')); el.classList.add('active'); renderChart(); }
+    
+    function updateSettings() { db.user.name = document.getElementById('settingName').value; db.user.currency = document.getElementById('settingCurrency').value; saveDB(); }
+    function exportData() { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = str; a.download = 'zenwealth_obsidian.json'; a.click(); }
+    function importData(input) { const reader = new FileReader(); reader.onload = (e) => { db = JSON.parse(e.target.result); saveDB(); alert('Restored!'); }; reader.readAsText(input.files[0]); }
+    function hardReset() { if(confirm("Permanently Delete All Data?")) { localStorage.removeItem('zenwealth_obsidian_ult'); location.reload(); } }
 
     init();
 </script>
