@@ -3,219 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZenWealth | Stealth Finance OS</title>
+    <title>ZenWealth | Ultimate Finance OS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Zen Palette */
-            --bg: #050505;
-            --surface: #0f0f0f;
-            --surface-light: #1a1a1a;
-            --accent: #d4af37; /* Gold */
-            --accent-dim: rgba(212, 175, 55, 0.1);
-            --text-main: #e5e5e5;
-            --text-muted: #737373;
+            --bg: #000000;
+            --surface: #0f0f11;
+            --surface-2: #18181b;
+            --accent: #d4af37; /* Zen Gold */
+            --accent-glow: rgba(212, 175, 55, 0.25);
+            --text-main: #f4f4f5;
+            --text-muted: #71717a;
             --success: #10b981;
             --danger: #ef4444;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.05);
-            --blur: 0px;
+            --border: rgba(255, 255, 255, 0.08);
+            --blur-strength: 0px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Manrope', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
-        /* --- TYPOGRAPHY --- */
-        .cinzel { font-family: 'Cinzel', serif; }
+        /* --- UTILITY & ANIMATION --- */
         .hidden { display: none !important; }
-        .blur-sensitive { filter: blur(var(--blur)); transition: 0.3s ease; }
+        .blur-sensitive { filter: blur(var(--blur-strength)); transition: filter 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
         
-        /* --- ANIMATIONS --- */
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-up { animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-
         /* --- HEADER --- */
-        header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); z-index: 50; }
-        .brand { font-size: 1.2rem; font-weight: 600; letter-spacing: 1px; color: var(--accent); }
-        .privacy-toggle { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--surface); color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); transition: 0.3s; }
-        .privacy-toggle.active { color: var(--text-main); border-color: var(--accent); }
+        header { 
+            padding: 15px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+            z-index: 50; 
+        }
+        .header-left h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; color: var(--accent); }
+        .header-left p { font-size: 0.8rem; color: var(--text-muted); }
+        .privacy-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .privacy-btn.active { color: var(--text-main); border: 1px solid var(--accent); }
 
         /* --- MAIN SCROLL AREA --- */
-        main { flex: 1; overflow-y: auto; padding: 0 20px 100px; scroll-behavior: smooth; }
+        main { flex: 1; overflow-y: auto; padding: 20px 20px 120px; scroll-behavior: smooth; }
 
         /* --- CARDS --- */
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
-        .card-gold { background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border-color: rgba(212, 175, 55, 0.2); }
-        .card-gold::after { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, var(--accent-dim) 0%, transparent 70%); pointer-events: none; }
-
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 16px; position: relative; }
+        .card-gold { background: linear-gradient(135deg, var(--surface), #1a1a0f); border-color: rgba(212, 175, 55, 0.3); }
+        .card-gold::after { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%); pointer-events: none; }
+        
         /* --- METRICS --- */
-        .metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 8px; }
-        .metric-value { font-size: 2.2rem; font-weight: 400; font-family: 'Cinzel', serif; letter-spacing: -1px; }
-        .sub-metric { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
-
-        /* --- PROGRESS BARS --- */
-        .progress-track { height: 4px; background: var(--surface-light); width: 100%; border-radius: 2px; margin-top: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; border-radius: 2px; }
-
-        /* --- GRID --- */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .mini-card { background: var(--surface); padding: 16px; border-radius: 16px; border: 1px solid var(--border); }
-        .mini-value { font-size: 1.1rem; font-weight: 600; margin-top: 5px; }
+        .metric-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 5px; }
+        .metric-val { font-size: 2rem; font-weight: 600; letter-spacing: -0.5px; }
+        
+        /* --- AI MOTIVATION --- */
+        .ai-banner { background: var(--surface-2); padding: 15px; border-radius: 16px; border-left: 3px solid var(--accent); margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-start; }
+        .ai-icon { color: var(--accent); font-size: 1.2rem; margin-top: 2px; }
+        .ai-text { font-size: 0.9rem; line-height: 1.4; color: #d4d4d8; }
 
         /* --- LISTS --- */
-        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-top: 30px; }
-        .list-header h3 { font-size: 1rem; font-weight: 500; color: var(--text-main); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; }
-        .list-item:active { opacity: 0.6; }
-        .icon-box { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; color: var(--text-muted); margin-right: 15px; }
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin: 25px 0 10px; }
+        .list-header h3 { font-size: 1rem; font-weight: 600; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .item-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--surface-2); display: flex; justify-content: center; align-items: center; margin-right: 15px; color: var(--text-muted); font-size: 1rem; }
         
-        /* --- BOTTOM NAV --- */
-        .dock { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; display: flex; justify-content: space-evenly; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 100; }
-        .dock-item { color: var(--text-muted); font-size: 1.4rem; transition: 0.3s; cursor: pointer; position: relative; }
-        .dock-item.active { color: var(--accent); transform: translateY(-3px); }
+        /* --- CHART CONTROLS --- */
+        .chart-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .chart-tab { padding: 6px 12px; background: var(--surface-2); border-radius: 20px; font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .chart-tab.active { background: var(--accent-glow); color: var(--accent); border-color: var(--accent); }
+
+        /* --- CALENDAR --- */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; text-align: center; }
+        .cal-day-header { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; }
+        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; background: var(--surface-2); font-size: 0.9rem; cursor: pointer; position: relative; }
+        .cal-day.today { border: 1px solid var(--accent); color: var(--accent); }
+        .cal-day.has-event::after { content: ''; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin-top: 4px; }
+        .cal-day:hover { background: rgba(255,255,255,0.1); }
+
+        /* --- GOALS --- */
+        .goal-bar-bg { height: 6px; background: var(--surface-2); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+        .goal-bar-fill { height: 100%; background: var(--success); width: 0%; border-radius: 3px; transition: width 1s; }
+        .goal-insight { font-size: 0.8rem; color: var(--accent); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+
+        /* --- BOTTOM DOCK --- */
+        .dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; background: rgba(15, 15, 17, 0.9); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; display: flex; justify-content: space-around; padding: 14px 0; z-index: 100; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.6); }
+        .dock-item { color: var(--text-muted); font-size: 1.3rem; position: relative; cursor: pointer; transition: 0.2s; padding: 0 10px; }
+        .dock-item.active { color: var(--accent); transform: translateY(-4px); }
         .dock-item.active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); }
 
-        /* --- FAB --- */
-        .fab { position: fixed; bottom: 110px; right: 25px; width: 60px; height: 60px; background: var(--accent); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); z-index: 90; cursor: pointer; transition: transform 0.2s; }
+        /* --- MODALS --- */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(5px); }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal-sheet { background: #121212; width: 100%; max-width: 500px; border-radius: 24px 24px 0 0; padding: 25px; transform: translateY(100%); transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--border); }
+        .modal.active .modal-sheet { transform: translateY(0); }
+        
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+        .input-field { width: 100%; background: var(--surface-2); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.2s; }
+        .input-field:focus { border-color: var(--accent); }
+        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 10px; }
+
+        /* Floating Add Button */
+        .fab { position: fixed; bottom: 100px; right: 20px; width: 56px; height: 56px; background: var(--accent); color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; box-shadow: 0 0 25px var(--accent-glow); z-index: 90; cursor: pointer; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
 
-        /* --- MODAL --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(8px); }
-        .modal-overlay.active { opacity: 1; pointer-events: all; }
-        .modal-sheet { background: #121212; width: 100%; max-width: 500px; border-radius: 30px 30px 0 0; padding: 30px 24px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--border); }
-        .modal-overlay.active .modal-sheet { transform: translateY(0); }
-        
-        .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
-        .input-field { width: 100%; background: var(--surface); border: 1px solid var(--border); color: white; padding: 14px; border-radius: 12px; font-size: 1rem; outline: none; transition: 0.3s; }
-        .input-field:focus { border-color: var(--accent); }
-        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; margin-top: 10px; }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); margin-top: 10px; border: 1px solid rgba(239, 68, 68, 0.2); }
-
-        /* --- TABS in Modal --- */
-        .tabs { display: flex; background: var(--surface); padding: 4px; border-radius: 14px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .tab { flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; color: var(--text-muted); border-radius: 10px; cursor: pointer; }
-        .tab.active { background: var(--surface-light); color: white; font-weight: 600; }
-
+        /* --- ONBOARDING --- */
+        #onboarding { position: fixed; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; }
+        .welcome-text { font-size: 1.8rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
+    <div id="onboarding" class="hidden">
+        <i class="fa-solid fa-infinity" style="font-size: 3rem; color: var(--accent); margin-bottom: 20px;"></i>
+        <div class="welcome-text">ZenWealth</div>
+        <p style="color:var(--text-muted); margin-bottom: 40px; line-height:1.5;">Master your finances with<br>clarity and calm.</p>
+        <input type="text" id="setupName" class="input-field" placeholder="Enter your name" style="margin-bottom: 15px; text-align: center;">
+        <select id="setupCurrency" class="input-field" style="margin-bottom: 25px; text-align: center;">
+            <option value="USD">USD ($)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="EUR">EUR (€)</option>
+        </select>
+        <button class="btn btn-primary" onclick="completeOnboarding()">Begin Journey</button>
+    </div>
+
     <header>
-        <div class="brand cinzel">ZenWealth</div>
-        <div class="privacy-toggle" id="privacyBtn" onclick="togglePrivacy()">
+        <div class="header-left">
+            <h1 id="headerName">ZenWealth</h1>
+            <p id="headerGreeting">Good Morning</p>
+        </div>
+        <div class="privacy-btn" id="privacyToggle" onclick="togglePrivacy()">
             <i class="fa-solid fa-eye-slash"></i>
         </div>
     </header>
 
-    <main id="view-home" class="animate-up">
+    <main id="view-home" class="fade-in">
+        <div class="ai-banner">
+            <i class="fa-solid fa-robot ai-icon"></i>
+            <div class="ai-text" id="aiMotivation">Calculating your financial path...</div>
+        </div>
+
         <div class="card card-gold">
-            <div class="metric-label">Total Net Worth</div>
-            <div class="metric-value blur-sensitive" id="netWorthDisplay">$0.00</div>
-            <div class="sub-metric blur-sensitive" id="netWorthChange">
-                <i class="fa-solid fa-arrow-trend-up"></i> +0.0% this month
+            <div class="metric-title">Net Worth</div>
+            <div class="metric-val blur-sensitive" id="netWorth">$0.00</div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">
+                Assets - Liabilities
             </div>
         </div>
 
-        <div class="card" style="padding: 20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.9rem; color:var(--text-main);">Financial Freedom</span>
-                <span style="font-size:0.9rem; color:var(--accent);" id="freedomPercent">0%</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+            <div class="card" style="padding: 15px; margin:0;">
+                <div class="metric-title">Income (Mo)</div>
+                <div class="metric-val blur-sensitive" style="color:var(--success); font-size:1.4rem;" id="moIncome">$0</div>
             </div>
-            <div class="progress-track">
-                <div class="progress-fill" id="freedomBar"></div>
-            </div>
-            <div class="sub-metric" style="margin-top:10px;">
-                Target: <span class="blur-sensitive" id="freedomTarget">$0</span> (25x Annual Exp)
+            <div class="card" style="padding: 15px; margin:0;">
+                <div class="metric-title">Expense (Mo)</div>
+                <div class="metric-val blur-sensitive" style="color:var(--danger); font-size:1.4rem;" id="moExpense">$0</div>
             </div>
         </div>
 
-        <div class="grid-2">
-            <div class="mini-card">
-                <div class="metric-label">Liquid Assets</div>
-                <div class="mini-value blur-sensitive" style="color:var(--success)" id="liquidAssetDisplay">$0</div>
-            </div>
-            <div class="mini-card">
-                <div class="metric-label">Liabilities</div>
-                <div class="mini-value blur-sensitive" style="color:var(--danger)" id="liabilityDisplay">$0</div>
-            </div>
+        <div class="list-header" style="margin-top:0;">
+            <h3>Active Goals</h3>
+            <i class="fa-solid fa-plus" style="color:var(--accent); cursor:pointer;" onclick="openModal('modalGoal')"></i>
         </div>
+        <div id="homeGoalsList"></div>
 
         <div class="list-header">
             <h3>Recent Activity</h3>
-            <span style="font-size:0.8rem; color:var(--accent); cursor:pointer;" onclick="switchView('activity')">View All</span>
+            <span style="font-size:0.85rem; color:var(--accent); cursor:pointer;" onclick="switchView('analytics')">View All</span>
         </div>
-        <div id="recentList"></div>
+        <div id="homeTransList"></div>
     </main>
 
-    <main id="view-wealth" class="hidden animate-up">
-        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Assets & Liabilities</h2>
+    <main id="view-wealth" class="hidden fade-in">
+        <h2 style="margin-bottom: 20px;">Wealth Portfolio</h2>
         
         <div class="card">
             <div class="list-header" style="margin-top:0;">
-                <h3>Investment Assets</h3>
-                <i class="fa-solid fa-plus" style="color:var(--accent); cursor:pointer;" onclick="openAssetModal()"></i>
+                <h3 style="color:var(--success)">Assets</h3>
+                <i class="fa-solid fa-plus" onclick="openAssetModal('asset')"></i>
             </div>
-            <div id="assetList"></div>
-        </div>
-
-        <div class="card">
-            <div class="list-header" style="margin-top:0;">
-                <h3>Loans & Liabilities</h3>
-                <i class="fa-solid fa-plus" style="color:var(--danger); cursor:pointer;" onclick="openLiabilityModal()"></i>
-            </div>
-            <div id="liabilityList"></div>
-        </div>
-
-        <div class="card" style="background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2);">
-            <div class="metric-label" style="color:var(--danger)">Debt Freedom Est.</div>
-            <div class="mini-value" id="debtFreeDate">Debt Free</div>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Based on current EMIs</p>
-        </div>
-    </main>
-
-    <main id="view-analytics" class="hidden animate-up">
-        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Analytics</h2>
-        
-        <div class="card" style="height: 250px;">
-            <canvas id="cashflowChart"></canvas>
-        </div>
-
-        <div class="card">
-            <div class="metric-label">Runway</div>
-            <div class="metric-value blur-sensitive" id="runwayDisplay">∞</div>
-            <div class="sub-metric">Months you can survive without income</div>
+            <div id="listAssets"></div>
         </div>
 
         <div class="card">
             <div class="list-header" style="margin-top:0;">
-                <h3>Monthly Breakdown</h3>
+                <h3 style="color:var(--danger)">Liabilities</h3>
+                <i class="fa-solid fa-plus" onclick="openAssetModal('liability')"></i>
             </div>
-            <div id="categoryBreakdown"></div>
+            <div id="listLiabilities"></div>
         </div>
     </main>
 
-    <main id="view-settings" class="hidden animate-up">
-        <h2 class="cinzel" style="margin: 20px 0; font-size:1.5rem;">Settings</h2>
+    <main id="view-analytics" class="hidden fade-in">
+        <h2 style="margin-bottom: 15px;">Analytics Studio</h2>
         
+        <div class="chart-tabs">
+            <div class="chart-tab active" onclick="setChartType('bar', this)">Cash Flow</div>
+            <div class="chart-tab" onclick="setChartType('pie', this)">Breakdown</div>
+            <div class="chart-tab" onclick="setChartType('line', this)">Trend</div>
+        </div>
+        <div class="chart-tabs">
+            <div class="chart-tab active" onclick="setChartFilter(1, this)">1M</div>
+            <div class="chart-tab" onclick="setChartFilter(3, this)">3M</div>
+            <div class="chart-tab" onclick="setChartFilter(6, this)">6M</div>
+            <div class="chart-tab" onclick="setChartFilter(12, this)">1Y</div>
+        </div>
+
+        <div class="card" style="height: 300px; display:flex; align-items:center; justify-content:center;">
+            <canvas id="mainChart"></canvas>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Runway Forecast</div>
+            <div class="metric-val blur-sensitive" id="runwayVal">0 Months</div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Based on avg. monthly expense</p>
+        </div>
+    </main>
+
+    <main id="view-planner" class="hidden fade-in">
+        <h2 style="margin-bottom: 20px;">Planner</h2>
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="calMonthYear">Month Year</h3>
+                <div>
+                    <i class="fa-solid fa-chevron-left" style="padding:10px; cursor:pointer;" onclick="changeMonth(-1)"></i>
+                    <i class="fa-solid fa-chevron-right" style="padding:10px; cursor:pointer;" onclick="changeMonth(1)"></i>
+                </div>
+            </div>
+            <div class="cal-grid" id="calendarGrid"></div>
+        </div>
+        
+        <div class="list-header">
+            <h3>Scheduled on <span id="selectedDateDisp" style="color:var(--accent)">Selected</span></h3>
+        </div>
+        <div id="plannerList"></div>
+        <button class="btn btn-primary" onclick="openModal('modalTrans'); document.getElementById('tDate').value = selectedDateStr;">+ Add Schedule</button>
+    </main>
+
+    <main id="view-settings" class="hidden fade-in">
+        <h2 style="margin-bottom: 20px;">Settings</h2>
         <div class="card">
             <div class="input-group">
-                <label>Currency Symbol</label>
-                <select id="currencySelect" class="input-field" onchange="updateCurrency()">
-                    <option value="USD">$ USD</option>
-                    <option value="INR">₹ INR</option>
-                    <option value="EUR">€ EUR</option>
+                <label class="input-label">Display Name</label>
+                <input type="text" id="settingName" class="input-field" onchange="updateSettings()">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Currency</label>
+                <select id="settingCurrency" class="input-field" onchange="updateSettings()">
+                    <option value="USD">USD ($)</option>
+                    <option value="INR">INR (₹)</option>
+                    <option value="EUR">EUR (€)</option>
                 </select>
             </div>
-            <button class="btn btn-primary" onclick="exportData()"><i class="fa-solid fa-download"></i> Export Data</button>
+        </div>
+        <div class="card">
+            <div class="item-row" onclick="exportData()">
+                <span>Export Data (JSON)</span>
+                <i class="fa-solid fa-download"></i>
+            </div>
+            <div class="item-row" onclick="document.getElementById('importFile').click()">
+                <span>Import Data</span>
+                <i class="fa-solid fa-upload"></i>
+            </div>
             <input type="file" id="importFile" class="hidden" onchange="importData(this)">
-            <button class="btn" style="background:var(--surface-light); color:white; margin-top:10px;" onclick="document.getElementById('importFile').click()"><i class="fa-solid fa-upload"></i> Import Data</button>
-            <button class="btn btn-danger" onclick="hardReset()">Factory Reset</button>
+            <div class="item-row" style="border:none; color:var(--danger);" onclick="hardReset()">
+                <span>Factory Reset</span>
+                <i class="fa-solid fa-trash"></i>
+            </div>
         </div>
     </main>
 
@@ -227,448 +284,571 @@
         <div class="dock-item active" onclick="switchView('home')"><i class="fa-solid fa-house"></i></div>
         <div class="dock-item" onclick="switchView('wealth')"><i class="fa-solid fa-gem"></i></div>
         <div class="dock-item" onclick="switchView('analytics')"><i class="fa-solid fa-chart-pie"></i></div>
+        <div class="dock-item" onclick="switchView('planner')"><i class="fa-solid fa-calendar-days"></i></div>
         <div class="dock-item" onclick="switchView('settings')"><i class="fa-solid fa-sliders"></i></div>
     </div>
 
-    <div class="modal-overlay" id="transModal">
+    <div class="modal" id="modalTrans">
         <div class="modal-sheet">
-            <div class="sheet-header">
-                <h3 id="transModalTitle">New Transaction</h3>
-                <i class="fa-solid fa-times" onclick="closeModal('transModal')" style="cursor:pointer; font-size:1.2rem;"></i>
-            </div>
-            <div class="tabs">
-                <div class="tab active" id="tabExpense" onclick="setTransType('expense')">Expense</div>
-                <div class="tab" id="tabIncome" onclick="setTransType('income')">Income</div>
-            </div>
-            <input type="hidden" id="tId"> <div class="input-group">
-                <input type="text" id="tDesc" class="input-field" placeholder="Description (e.g. Dinner)">
-            </div>
+            <h3 style="margin-bottom:20px;" id="transTitle">New Transaction</h3>
+            <input type="hidden" id="tId">
             <div class="input-group">
-                <input type="number" id="tAmt" class="input-field" placeholder="Amount">
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <button class="btn" style="margin:0; background:var(--surface-2); color:white;" id="btnExp" onclick="setTransType('expense')">Expense</button>
+                    <button class="btn" style="margin:0; background:var(--surface-2); color:white;" id="btnInc" onclick="setTransType('income')">Income</button>
+                </div>
             </div>
-            <div class="input-group">
-                <select id="tCat" class="input-field">
-                    <option value="Food">🍔 Food</option>
-                    <option value="Transport">🚕 Transport</option>
-                    <option value="Shopping">🛍️ Shopping</option>
-                    <option value="Bills">🧾 Bills</option>
-                    <option value="Salary">💰 Salary</option>
-                    <option value="Investment">📈 Investment</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" onclick="saveTransaction()">Save Record</button>
-            <button class="btn btn-danger hidden" id="btnDeleteTrans" onclick="deleteTransaction()">Delete</button>
+            <input type="text" id="tDesc" class="input-field" placeholder="Description" style="margin-bottom:12px;">
+            <input type="number" id="tAmt" class="input-field" placeholder="0.00" style="margin-bottom:12px;">
+            
+            <select id="tCat" class="input-field" style="margin-bottom:12px;" onchange="checkCustomCat(this)">
+                <option value="Food">🍔 Food</option>
+                <option value="Transport">🚕 Transport</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Bills">🧾 Bills</option>
+                <option value="Salary">💰 Salary</option>
+                <option value="Other">✏️ Other...</option>
+            </select>
+            <input type="text" id="tCustomCat" class="input-field hidden" placeholder="Enter Category Name" style="margin-bottom:12px;">
+            
+            <input type="date" id="tDate" class="input-field" style="margin-bottom:12px;">
+            
+            <button class="btn btn-primary" onclick="saveTransaction()">Save</button>
+            <button class="btn btn-danger hidden" id="btnDelTrans" onclick="deleteItem('transaction')">Delete</button>
+            <button class="btn" style="background:transparent; color:var(--text-muted); margin-top:5px;" onclick="closeModal('modalTrans')">Cancel</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="assetModal">
+    <div class="modal" id="modalGoal">
         <div class="modal-sheet">
-            <div class="sheet-header">
-                <h3 id="assetModalTitle">Add Asset</h3>
-                <i class="fa-solid fa-times" onclick="closeModal('assetModal')" style="cursor:pointer;"></i>
-            </div>
-            <div class="input-group">
-                <label>Name</label>
-                <input type="text" id="aName" class="input-field" placeholder="e.g. Gold, Tesla Stock">
-            </div>
-            <div class="input-group">
-                <label>Current Value</label>
-                <input type="number" id="aValue" class="input-field" placeholder="0.00">
-            </div>
-            <div id="liabilityFields" class="hidden">
-                <div class="input-group">
-                    <label>Monthly EMI</label>
-                    <input type="number" id="aEmi" class="input-field" placeholder="0.00">
-                </div>
-                <div class="input-group">
-                    <label>Interest Rate (%)</label>
-                    <input type="number" id="aRate" class="input-field" placeholder="8.5">
-                </div>
-            </div>
+            <h3 style="margin-bottom:20px;">Set Smart Goal</h3>
+            <input type="hidden" id="gId">
+            <input type="text" id="gName" class="input-field" placeholder="Goal Name (e.g. New Laptop)" style="margin-bottom:12px;">
+            <input type="number" id="gTarget" class="input-field" placeholder="Target Amount" style="margin-bottom:12px;">
+            <input type="number" id="gSaved" class="input-field" placeholder="Already Saved" style="margin-bottom:12px;">
+            <label class="input-label">Target Date</label>
+            <input type="date" id="gDate" class="input-field" style="margin-bottom:12px;">
+            
+            <button class="btn btn-primary" onclick="saveGoal()">Create Goal</button>
+             <button class="btn btn-danger hidden" id="btnDelGoal" onclick="deleteItem('goal')">Delete</button>
+            <button class="btn" style="background:transparent; color:var(--text-muted);" onclick="closeModal('modalGoal')">Cancel</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalAsset">
+        <div class="modal-sheet">
+            <h3 style="margin-bottom:20px;" id="assetTitle">Add Asset</h3>
+            <input type="hidden" id="aId">
+            <input type="hidden" id="aType">
+            <input type="text" id="aName" class="input-field" placeholder="Name" style="margin-bottom:12px;">
+            <input type="number" id="aValue" class="input-field" placeholder="Current Value" style="margin-bottom:12px;">
             <button class="btn btn-primary" onclick="saveAsset()">Save</button>
+            <button class="btn btn-danger hidden" id="btnDelAsset" onclick="deleteItem('asset')">Delete</button>
+            <button class="btn" style="background:transparent; color:var(--text-muted);" onclick="closeModal('modalAsset')">Cancel</button>
         </div>
     </div>
 
 <script>
-    // --- STATE & CONFIG ---
-    let data = {
-        currency: 'USD',
+    // --- APP CORE ---
+    let db = {
+        user: { name: '', currency: 'USD' },
         transactions: [],
-        assets: [], // {id, name, value, type: 'asset'}
-        liabilities: [] // {id, name, value, emi, rate, type: 'liability'}
+        goals: [],
+        assets: [],
+        liabilities: []
+    };
+    
+    let state = {
+        view: 'home',
+        privacy: false,
+        transType: 'expense',
+        editId: null,
+        calDate: new Date(),
+        chartType: 'bar',
+        chartFilter: 1 // months
     };
 
-    let currentTransType = 'expense';
-    let editModeId = null;
-    let privacyMode = true; // Default stealthy
-    
-    const currencySym = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
+    const currencyMap = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
 
     // --- INIT ---
     function init() {
-        const stored = localStorage.getItem('zenwealth_db');
-        if(stored) data = JSON.parse(stored);
-        
-        // Apply Settings
-        document.getElementById('currencySelect').value = data.currency;
-        
-        // Initial privacy state
-        togglePrivacy(); // run once to set visuals (logic toggles it, so we call it to init)
-        togglePrivacy(); // flip back to intended default
-
-        renderAll();
-    }
-
-    function saveData() {
-        localStorage.setItem('zenwealth_db', JSON.stringify(data));
-        renderAll();
-    }
-
-    // --- LOGIC ENGINE ---
-    function renderAll() {
-        const sym = currencySym[data.currency];
-        
-        // 1. Calculate Totals
-        const totalAssets = data.assets.reduce((a,b) => a + b.value, 0);
-        const totalLiabilities = data.liabilities.reduce((a,b) => a + b.value, 0);
-        
-        // Liquid Cash (Income - Expense)
-        const income = data.transactions.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0);
-        const expense = data.transactions.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0);
-        const liquidCash = income - expense;
-
-        const netWorth = (liquidCash + totalAssets) - totalLiabilities;
-
-        // 2. Render Metrics
-        document.getElementById('netWorthDisplay').innerText = formatMoney(netWorth);
-        document.getElementById('liquidAssetDisplay').innerText = formatMoney(liquidCash);
-        document.getElementById('liabilityDisplay').innerText = formatMoney(totalLiabilities);
-
-        // 3. Financial Freedom (4% Rule)
-        // Est Annual Expense = Last 30 days expense * 12
-        const last30Expense = getLast30DaysExpense();
-        const annualExpense = last30Expense * 12;
-        const fireNumber = annualExpense * 25; 
-        
-        const freedomPercent = fireNumber > 0 ? Math.min((netWorth / fireNumber) * 100, 100) : 0;
-        document.getElementById('freedomPercent').innerText = freedomPercent.toFixed(1) + '%';
-        document.getElementById('freedomBar').style.width = freedomPercent + '%';
-        document.getElementById('freedomTarget').innerText = formatMoney(fireNumber);
-
-        // 4. Runway
-        // Runway = Liquid Cash / Avg Monthly Expense
-        const avgExp = last30Expense || 1;
-        const runway = liquidCash / avgExp;
-        document.getElementById('runwayDisplay').innerText = liquidCash > 0 ? runway.toFixed(1) : '0';
-
-        // 5. Debt Snowball Estimate
-        const totalEMI = data.liabilities.reduce((a,b) => a + (b.emi || 0), 0);
-        if(totalLiabilities > 0 && totalEMI > 0) {
-            const monthsToFree = totalLiabilities / totalEMI;
-            document.getElementById('debtFreeDate').innerText = monthsToFree.toFixed(1) + " Months";
-        } else if (totalLiabilities === 0) {
-            document.getElementById('debtFreeDate').innerText = "Debt Free ✨";
+        const stored = localStorage.getItem('zenwealth_ult_db');
+        if(stored) {
+            db = JSON.parse(stored);
+            document.getElementById('onboarding').classList.add('hidden');
+            renderAll();
         } else {
-            document.getElementById('debtFreeDate').innerText = "N/A";
+            document.getElementById('onboarding').classList.remove('hidden');
         }
+    }
+
+    function saveDB() {
+        localStorage.setItem('zenwealth_ult_db', JSON.stringify(db));
+        renderAll();
+    }
+
+    function completeOnboarding() {
+        const name = document.getElementById('setupName').value;
+        const curr = document.getElementById('setupCurrency').value;
+        if(name) {
+            db.user.name = name;
+            db.user.currency = curr;
+            saveDB();
+            document.getElementById('onboarding').classList.add('hidden');
+        }
+    }
+
+    // --- RENDER LOGIC ---
+    function renderAll() {
+        // 1. Header
+        document.getElementById('headerName').innerText = `ZenWealth`;
+        document.getElementById('headerGreeting').innerText = `Hello, ${db.user.name}`;
+        document.getElementById('settingName').value = db.user.name;
+        document.getElementById('settingCurrency').value = db.user.currency;
+
+        const sym = currencyMap[db.user.currency];
+
+        // 2. Financial Logic
+        const totalAssets = db.assets.reduce((a,b)=>a+b.value,0);
+        const totalLiabilities = db.liabilities.reduce((a,b)=>a+b.value,0);
+        
+        // Income/Exp Logic
+        const currMonth = new Date().getMonth();
+        const mTrans = db.transactions.filter(t => new Date(t.date).getMonth() === currMonth);
+        const mInc = mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
+        const mExp = mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
+        
+        // All Time Liquid
+        const allInc = db.transactions.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
+        const allExp = db.transactions.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
+        const liquid = allInc - allExp;
+        const netWorth = (liquid + totalAssets) - totalLiabilities;
+
+        document.getElementById('netWorth').innerText = formatMoney(netWorth);
+        document.getElementById('moIncome').innerText = `+${formatMoney(mInc)}`;
+        document.getElementById('moExpense').innerText = `-${formatMoney(mExp)}`;
+
+        // Runway
+        const avgExp = mExp || 1;
+        const runway = liquid > 0 ? (liquid / avgExp).toFixed(1) : '0';
+        document.getElementById('runwayVal').innerText = `${runway} Months`;
+
+        // 3. Motivational AI
+        const rate = mInc > 0 ? ((mInc - mExp)/mInc)*100 : 0;
+        let aiMsg = "Track your expenses to see insights.";
+        if(mExp > mInc) aiMsg = `⚠️ Caution: You've spent more than you earned this month. Review your 'Food' or 'Shopping' spend.`;
+        else if (rate > 20) aiMsg = `🔥 Excellent! Saving ${rate.toFixed(0)}% this month. Keep this up to hit financial freedom sooner.`;
+        else if (liquid > 1000) aiMsg = `💡 You have surplus cash. Consider moving ${formatMoney(liquid*0.2)} into an Asset like Gold/Stocks.`;
+        document.getElementById('aiMotivation').innerText = aiMsg;
 
         renderLists();
-        renderChart();
+        renderCalendar();
+        if(state.view === 'analytics') renderChart();
     }
 
-    function getLast30DaysExpense() {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        return data.transactions
-            .filter(t => t.type === 'expense' && new Date(t.date) >= thirtyDaysAgo)
-            .reduce((a,b) => a + b.amount, 0);
-    }
-
-    // --- LIST RENDERING ---
     function renderLists() {
-        const sym = currencySym[data.currency];
-        
-        // Transactions
-        const tList = document.getElementById('recentList');
+        const sym = currencyMap[db.user.currency];
+
+        // Trans List (Home)
+        const tList = document.getElementById('homeTransList');
         tList.innerHTML = '';
-        const sortedTrans = [...data.transactions].reverse().slice(0, 20); // Show last 20
-        
-        sortedTrans.forEach(t => {
-            const el = document.createElement('div');
-            el.className = 'list-item';
-            el.onclick = () => editTransaction(t.id);
-            const isInc = t.type === 'income';
+        [...db.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0, 10).forEach(t => {
+            tList.innerHTML += createTransHTML(t, sym);
+        });
+
+        // Goals List
+        const gList = document.getElementById('homeGoalsList');
+        gList.innerHTML = '';
+        db.goals.forEach(g => {
+            const pct = Math.min((g.saved/g.target)*100, 100);
             
-            el.innerHTML = `
-                <div style="display:flex; align-items:center;">
-                    <div class="icon-box" style="color:${isInc ? 'var(--success)' : 'var(--text-main)'}">
-                        <i class="fa-solid ${getCategoryIcon(t.category)}"></i>
-                    </div>
-                    <div>
-                        <div style="font-weight:500;">${t.desc}</div>
-                        <div style="font-size:0.75rem; color:var(--text-muted);">${new Date(t.date).toLocaleDateString()}</div>
-                    </div>
+            // Insight
+            const daysLeft = Math.ceil((new Date(g.date) - new Date()) / (86400000));
+            const needed = g.target - g.saved;
+            let insight = "Goal Reached! 🎉";
+            if(daysLeft > 0 && needed > 0) {
+                insight = `Save <b>${formatMoney(needed/daysLeft)}/day</b> to finish by due date.`;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.padding = '15px';
+            div.onclick = () => editGoal(g.id);
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                    <b>${g.name}</b>
+                    <span class="blur-sensitive">${formatMoney(g.saved)} / ${formatMoney(g.target)}</span>
                 </div>
-                <div class="blur-sensitive" style="font-weight:600; color:${isInc ? 'var(--success)' : 'var(--text-main)'}">
-                    ${isInc?'+':'-'}${sym}${t.amount.toLocaleString()}
-                </div>
+                <div class="goal-bar-bg"><div class="goal-bar-fill" style="width:${pct}%"></div></div>
+                <div class="goal-insight">${insight}</div>
             `;
-            tList.appendChild(el);
+            gList.appendChild(div);
         });
 
-        // Assets
-        const aList = document.getElementById('assetList');
+        // Assets/Liab
+        const aList = document.getElementById('listAssets');
         aList.innerHTML = '';
-        data.assets.forEach(a => {
-            aList.innerHTML += `
-                <div class="list-item">
-                     <div style="display:flex; align-items:center;">
-                        <div class="icon-box"><i class="fa-solid fa-coins"></i></div>
-                        <span>${a.name}</span>
-                    </div>
-                    <span class="blur-sensitive">${formatMoney(a.value)}</span>
-                </div>
-            `;
+        db.assets.forEach(a => {
+            aList.innerHTML += `<div class="item-row" onclick="editAsset('asset', ${a.id})">
+                <div style="display:flex;align-items:center;"><div class="item-icon"><i class="fa-solid fa-coins"></i></div>${a.name}</div>
+                <b class="blur-sensitive">${formatMoney(a.value)}</b>
+            </div>`;
         });
-
-        // Liabilities
-        const lList = document.getElementById('liabilityList');
+        
+        const lList = document.getElementById('listLiabilities');
         lList.innerHTML = '';
-        data.liabilities.forEach(l => {
-            lList.innerHTML += `
-                <div class="list-item">
-                     <div style="display:flex; align-items:center;">
-                        <div class="icon-box" style="color:var(--danger)"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                        <div>
-                            <div>${l.name}</div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi || 0)}</div>
-                        </div>
-                    </div>
-                    <span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span>
-                </div>
-            `;
+        db.liabilities.forEach(l => {
+            lList.innerHTML += `<div class="item-row" onclick="editAsset('liability', ${l.id})">
+                <div style="display:flex;align-items:center;"><div class="item-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>${l.name}</div>
+                <b class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</b>
+            </div>`;
         });
+    }
+
+    function createTransHTML(t, sym) {
+        const isInc = t.type === 'income';
+        return `<div class="item-row" onclick="editTransaction(${t.id})">
+            <div style="display:flex; align-items:center;">
+                <div class="item-icon" style="color:${isInc ? 'var(--success)' : 'var(--text-muted)'}">
+                    <i class="fa-solid ${getIcon(t.cat)}"></i>
+                </div>
+                <div>
+                    <div style="font-weight:500">${t.desc}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted)">${new Date(t.date).toLocaleDateString()}</div>
+                </div>
+            </div>
+            <div class="blur-sensitive" style="font-weight:600; color:${isInc?'var(--success)':'var(--text-main)'}">
+                ${isInc?'+':'-'}${formatMoney(t.amount)}
+            </div>
+        </div>`;
+    }
+
+    // --- CALENDAR ENGINE ---
+    let selectedDateStr = new Date().toISOString().split('T')[0];
+    
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        
+        const y = state.calDate.getFullYear();
+        const m = state.calDate.getMonth();
+        document.getElementById('calMonthYear').innerText = new Date(y, m).toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m+1, 0).getDate();
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // Empty slots
+        for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+        
+        // Days
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const hasEvent = db.transactions.some(t => t.date === dateStr);
+            const isToday = dateStr === todayStr;
+            const isSelected = dateStr === selectedDateStr;
+            
+            const el = document.createElement('div');
+            el.className = `cal-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}`;
+            el.style.background = isSelected ? 'var(--accent-glow)' : '';
+            el.innerText = d;
+            el.onclick = () => {
+                selectedDateStr = dateStr;
+                renderCalendar();
+                renderPlannerList();
+            };
+            grid.appendChild(el);
+        }
+        renderPlannerList();
+    }
+
+    function renderPlannerList() {
+        document.getElementById('selectedDateDisp').innerText = selectedDateStr;
+        const list = document.getElementById('plannerList');
+        list.innerHTML = '';
+        const dayTrans = db.transactions.filter(t => t.date === selectedDateStr);
+        
+        if(dayTrans.length === 0) {
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted)">No items this day</div>`;
+        } else {
+            dayTrans.forEach(t => {
+                list.innerHTML += createTransHTML(t, currencyMap[db.user.currency]);
+            });
+        }
+    }
+
+    function changeMonth(dir) {
+        state.calDate.setMonth(state.calDate.getMonth() + dir);
+        renderCalendar();
+    }
+
+    // --- CHART ENGINE ---
+    let myChart;
+    function renderChart() {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        if(myChart) myChart.destroy();
+        
+        // Filter Data
+        const cutoff = new Date();
+        cutoff.setMonth(cutoff.getMonth() - state.chartFilter);
+        const filtered = db.transactions.filter(t => new Date(t.date) >= cutoff);
+
+        // Process Data based on Type
+        let data, type = state.chartType;
+        let labels = [], d1 = [], d2 = [];
+
+        if(type === 'bar' || type === 'line') {
+            // Group by Month
+            const map = {};
+            filtered.forEach(t => {
+                const k = t.date.substring(0, 7); // YYYY-MM
+                if(!map[k]) map[k] = { inc:0, exp:0 };
+                if(t.type === 'income') map[k].inc += t.amount; else map[k].exp += t.amount;
+            });
+            labels = Object.keys(map).sort();
+            d1 = labels.map(k => map[k].inc);
+            d2 = labels.map(k => map[k].exp);
+            
+            data = {
+                labels: labels,
+                datasets: [
+                    { label: 'Income', data: d1, backgroundColor: '#10b981', borderColor: '#10b981', tension: 0.4 },
+                    { label: 'Expense', data: d2, backgroundColor: '#ef4444', borderColor: '#ef4444', tension: 0.4 }
+                ]
+            };
+        } else if (type === 'pie') {
+            // Group by Category (Expense Only)
+            const map = {};
+            filtered.filter(t=>t.type==='expense').forEach(t => {
+                map[t.cat] = (map[t.cat] || 0) + t.amount;
+            });
+            labels = Object.keys(map);
+            d1 = Object.values(map);
+            data = {
+                labels: labels,
+                datasets: [{ data: d1, backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'] }]
+            };
+        }
+
+        Chart.defaults.color = '#71717a';
+        myChart = new Chart(ctx, {
+            type: type,
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: type !== 'pie' ? {
+                    x: { grid: { display: false } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                } : {}
+            }
+        });
+    }
+
+    function setChartType(t, el) { 
+        state.chartType = t; 
+        document.querySelectorAll('.chart-tabs')[0].querySelectorAll('.chart-tab').forEach(e=>e.classList.remove('active'));
+        el.classList.add('active');
+        renderChart(); 
+    }
+    function setChartFilter(m, el) { 
+        state.chartFilter = m; 
+        document.querySelectorAll('.chart-tabs')[1].querySelectorAll('.chart-tab').forEach(e=>e.classList.remove('active'));
+        el.classList.add('active');
+        renderChart(); 
     }
 
     // --- ACTIONS ---
     
     // Transactions
-    function openTransModal(id = null) {
-        document.getElementById('transModal').classList.add('active');
-        document.getElementById('btnDeleteTrans').classList.add('hidden');
-        document.getElementById('transModalTitle').innerText = "New Transaction";
-        document.getElementById('tDesc').value = '';
-        document.getElementById('tAmt').value = '';
-        editModeId = null;
+    function openTransModal() {
+        resetModal('modalTrans');
+        state.editId = null;
+        document.getElementById('transTitle').innerText = "New Transaction";
+        document.getElementById('tDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('btnDelTrans').classList.add('hidden');
+        openModal('modalTrans');
     }
 
     function editTransaction(id) {
-        const t = data.transactions.find(x => x.id === id);
-        if(!t) return;
-        
-        openTransModal();
-        editModeId = id;
-        document.getElementById('transModalTitle').innerText = "Edit Transaction";
+        state.editId = id;
+        const t = db.transactions.find(x => x.id === id);
+        openModal('modalTrans');
+        document.getElementById('transTitle').innerText = "Edit Transaction";
         document.getElementById('tDesc').value = t.desc;
         document.getElementById('tAmt').value = t.amount;
-        document.getElementById('tCat').value = t.category;
-        document.getElementById('btnDeleteTrans').classList.remove('hidden');
+        document.getElementById('tDate').value = t.date;
+        document.getElementById('tCat').value = t.cat;
+        document.getElementById('btnDelTrans').classList.remove('hidden');
         setTransType(t.type);
+        // Custom cat handling
+        if(!['Food','Transport','Shopping','Bills','Salary'].includes(t.cat)) {
+            document.getElementById('tCat').value = 'Other';
+            document.getElementById('tCustomCat').classList.remove('hidden');
+            document.getElementById('tCustomCat').value = t.cat;
+        }
     }
 
     function saveTransaction() {
         const desc = document.getElementById('tDesc').value;
         const amount = parseFloat(document.getElementById('tAmt').value);
-        const cat = document.getElementById('tCat').value;
-        
-        if(!desc || !amount) return;
+        let cat = document.getElementById('tCat').value;
+        if(cat === 'Other') cat = document.getElementById('tCustomCat').value || 'Misc';
+        const date = document.getElementById('tDate').value;
 
-        if (editModeId) {
-            // Update Existing
-            const index = data.transactions.findIndex(x => x.id === editModeId);
-            if(index !== -1) {
-                data.transactions[index] = { ...data.transactions[index], desc, amount, category: cat, type: currentTransType };
+        if(desc && amount && date) {
+            if(state.editId) {
+                const idx = db.transactions.findIndex(x=>x.id===state.editId);
+                db.transactions[idx] = { id: state.editId, type: state.transType, desc, amount, cat, date };
+            } else {
+                db.transactions.push({ id: Date.now(), type: state.transType, desc, amount, cat, date });
             }
+            saveDB();
+            closeModal('modalTrans');
+        }
+    }
+
+    // Assets/Liab
+    function openAssetModal(type, id=null) {
+        state.editId = id;
+        document.getElementById('aType').value = type;
+        document.getElementById('btnDelAsset').classList.toggle('hidden', !id);
+        
+        if(id) {
+            const list = type === 'asset' ? db.assets : db.liabilities;
+            const item = list.find(x=>x.id===id);
+            document.getElementById('aName').value = item.name;
+            document.getElementById('aValue').value = item.value;
+            document.getElementById('assetTitle').innerText = "Edit Item";
         } else {
-            // Create New
-            data.transactions.push({
-                id: Date.now(),
-                date: new Date().toISOString(),
-                desc, amount, category: cat, type: currentTransType
-            });
+            resetModal('modalAsset');
+            document.getElementById('assetTitle').innerText = type === 'asset' ? "Add Asset" : "Add Liability";
         }
-        saveData();
-        closeModal('transModal');
-    }
-
-    function deleteTransaction() {
-        if(editModeId) {
-            data.transactions = data.transactions.filter(t => t.id !== editModeId);
-            saveData();
-            closeModal('transModal');
-        }
-    }
-
-    function setTransType(type) {
-        currentTransType = type;
-        document.getElementById('tabExpense').classList.toggle('active', type === 'expense');
-        document.getElementById('tabIncome').classList.toggle('active', type === 'income');
-    }
-
-    // Assets & Liabilities
-    let currentAssetType = 'asset';
-    function openAssetModal() {
-        currentAssetType = 'asset';
-        document.getElementById('assetModalTitle').innerText = "Add Investment/Asset";
-        document.getElementById('liabilityFields').classList.add('hidden');
-        document.getElementById('assetModal').classList.add('active');
-    }
-
-    function openLiabilityModal() {
-        currentAssetType = 'liability';
-        document.getElementById('assetModalTitle').innerText = "Add Loan/Liability";
-        document.getElementById('liabilityFields').classList.remove('hidden');
-        document.getElementById('assetModal').classList.add('active');
+        openModal('modalAsset');
     }
 
     function saveAsset() {
+        const type = document.getElementById('aType').value;
         const name = document.getElementById('aName').value;
         const value = parseFloat(document.getElementById('aValue').value);
-        
+        const list = type === 'asset' ? db.assets : db.liabilities;
+
         if(name && value) {
-            if(currentAssetType === 'asset') {
-                data.assets.push({ id: Date.now(), name, value });
+            if(state.editId) {
+                const idx = list.findIndex(x=>x.id===state.editId);
+                list[idx] = { id: state.editId, name, value };
             } else {
-                const emi = parseFloat(document.getElementById('aEmi').value) || 0;
-                const rate = parseFloat(document.getElementById('aRate').value) || 0;
-                data.liabilities.push({ id: Date.now(), name, value, emi, rate });
+                list.push({ id: Date.now(), name, value });
             }
-            saveData();
-            closeModal('assetModal');
+            saveDB();
+            closeModal('modalAsset');
         }
     }
 
-    // --- CHART ---
-    let myChart;
-    function renderChart() {
-        const ctx = document.getElementById('cashflowChart').getContext('2d');
-        if(myChart) myChart.destroy();
+    // Goals
+    function editGoal(id) {
+        state.editId = id;
+        const g = db.goals.find(x=>x.id===id);
+        document.getElementById('gName').value = g.name;
+        document.getElementById('gTarget').value = g.target;
+        document.getElementById('gSaved').value = g.saved;
+        document.getElementById('gDate').value = g.date;
+        document.getElementById('btnDelGoal').classList.remove('hidden');
+        openModal('modalGoal');
+    }
 
-        // Prepare Data (Last 6 Months)
-        const labels = [];
-        const incData = [];
-        const expData = [];
+    function saveGoal() {
+        const name = document.getElementById('gName').value;
+        const target = parseFloat(document.getElementById('gTarget').value);
+        const saved = parseFloat(document.getElementById('gSaved').value);
+        const date = document.getElementById('gDate').value;
         
-        for(let i=5; i>=0; i--) {
-            const d = new Date();
-            d.setMonth(d.getMonth() - i);
-            const label = d.toLocaleString('default', { month: 'short' });
-            labels.push(label);
-            
-            const mTrans = data.transactions.filter(t => {
-                const td = new Date(t.date);
-                return td.getMonth() === d.getMonth() && td.getFullYear() === d.getFullYear();
-            });
-
-            incData.push(mTrans.filter(t=>t.type=='income').reduce((a,b)=>a+b.amount,0));
-            expData.push(mTrans.filter(t=>t.type=='expense').reduce((a,b)=>a+b.amount,0));
-        }
-
-        Chart.defaults.color = '#737373';
-        myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    { label: 'Income', data: incData, backgroundColor: '#10b981', borderRadius: 4 },
-                    { label: 'Expense', data: expData, backgroundColor: '#ef4444', borderRadius: 4 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
-                }
+        if(name && target) {
+            if(state.editId) {
+                const idx = db.goals.findIndex(x=>x.id===state.editId);
+                db.goals[idx] = { id: state.editId, name, target, saved, date };
+            } else {
+                db.goals.push({ id: Date.now(), name, target, saved, date });
             }
-        });
+            saveDB();
+            closeModal('modalGoal');
+        }
+    }
+
+    function deleteItem(type) {
+        if(!confirm("Are you sure?")) return;
+        if(type === 'transaction') db.transactions = db.transactions.filter(x=>x.id !== state.editId);
+        if(type === 'asset') {
+            db.assets = db.assets.filter(x=>x.id !== state.editId);
+            db.liabilities = db.liabilities.filter(x=>x.id !== state.editId); // Lazy check both
+        }
+        if(type === 'goal') db.goals = db.goals.filter(x=>x.id !== state.editId);
+        saveDB();
+        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
     }
 
     // --- UTILS ---
-    function formatMoney(amount) {
-        const sym = currencySym[data.currency];
-        return sym + amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    function setTransType(t) {
+        state.transType = t;
+        document.getElementById('btnExp').style.background = t==='expense' ? 'var(--danger)' : 'var(--surface-2)';
+        document.getElementById('btnInc').style.background = t==='income' ? 'var(--success)' : 'var(--surface-2)';
     }
 
-    function getCategoryIcon(cat) {
-        const map = {
-            'Food': 'fa-utensils',
-            'Transport': 'fa-car',
-            'Shopping': 'fa-bag-shopping',
-            'Bills': 'fa-file-invoice',
-            'Salary': 'fa-money-bill-wave',
-            'Investment': 'fa-chart-line'
-        };
-        return map[cat] || 'fa-circle';
+    function checkCustomCat(el) {
+        document.getElementById('tCustomCat').classList.toggle('hidden', el.value !== 'Other');
+    }
+
+    function switchView(v) {
+        state.view = v;
+        document.querySelectorAll('main').forEach(m => m.classList.add('hidden'));
+        document.getElementById(`view-${v}`).classList.remove('hidden');
+        document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
+        // Find index manually or use simple mapping
+        const idx = ['home','wealth','analytics','planner','settings'].indexOf(v);
+        document.querySelectorAll('.dock-item')[idx].classList.add('active');
+        renderAll();
+    }
+
+    function formatMoney(n) { return (currencyMap[db.user.currency] || '$') + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
+    
+    function getIcon(c) {
+        const map = { 'Food':'fa-utensils', 'Transport':'fa-car', 'Shopping':'fa-bag-shopping', 'Bills':'fa-file-invoice', 'Salary':'fa-money-bill-wave' };
+        return map[c] || 'fa-tag';
     }
 
     function togglePrivacy() {
-        privacyMode = !privacyMode;
-        document.documentElement.style.setProperty('--blur', privacyMode ? '6px' : '0px');
-        document.getElementById('privacyBtn').classList.toggle('active', !privacyMode);
+        state.privacy = !state.privacy;
+        document.documentElement.style.setProperty('--blur-strength', state.privacy ? '6px' : '0px');
+        document.getElementById('privacyToggle').classList.toggle('active', state.privacy);
     }
 
-    function switchView(view) {
-        document.querySelectorAll('main').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`view-${view}`).classList.remove('hidden');
-        document.querySelectorAll('.dock-item').forEach((el, idx) => {
-            el.classList.toggle('active', ['home', 'wealth', 'analytics', 'settings'][idx] === view);
-        });
-        if(view === 'analytics') renderChart();
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function resetModal(id) { 
+        document.getElementById(id).querySelectorAll('input').forEach(i=>i.value=''); 
+        if(id==='modalTrans') { setTransType('expense'); document.getElementById('tCat').value='Food'; checkCustomCat(document.getElementById('tCat')); }
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
+    function updateSettings() {
+        db.user.name = document.getElementById('settingName').value;
+        db.user.currency = document.getElementById('settingCurrency').value;
+        saveDB();
     }
-
-    function updateCurrency() {
-        data.currency = document.getElementById('currencySelect').value;
-        saveData();
-    }
-
+    
     function exportData() {
-        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const a = document.createElement('a');
-        a.href = str; a.download = 'zenwealth_backup.json';
-        a.click();
+        const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+        const a = document.createElement('a'); a.href = str; a.download = 'zenwealth_backup.json'; a.click();
     }
-
+    
     function importData(input) {
-        const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                data = JSON.parse(e.target.result);
-                saveData();
-                alert('Import Successful');
-                location.reload();
-            } catch(e) { alert('Invalid File'); }
-        };
-        reader.readAsText(file);
+        reader.onload = (e) => { db = JSON.parse(e.target.result); saveDB(); alert('Restored!'); };
+        reader.readAsText(input.files[0]);
     }
+    
+    function hardReset() { if(confirm("Reset Everything?")) { localStorage.removeItem('zenwealth_ult_db'); location.reload(); } }
 
-    function hardReset() {
-        if(confirm("Permanently delete all data?")) {
-            localStorage.removeItem('zenwealth_db');
-            location.reload();
-        }
-    }
-
-    // Start
     init();
-
 </script>
 </body>
 </html>
