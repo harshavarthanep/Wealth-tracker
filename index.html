@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ZenWealth | Obsidian Ultimate</title>
+    <title>ZenWealth | Obsidian Production</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,11 +20,11 @@
             
             /* Accents */
             --accent: #ffffff; 
-            --accent-dim: rgba(255, 255, 255, 0.1);
-            --success: #00ff9d; /* Cyber Green */
-            --danger: #ff4d4d; /* Cyber Red */
+            --success: #00ff9d; 
+            --danger: #ff4d4d;
+            --warning: #ffb700;
             
-            --radius: 8px; /* Sharp corners */
+            --radius: 8px;
             --blur: 0px;
         }
 
@@ -52,7 +52,7 @@
         /* --- MAIN SCROLL --- */
         main { flex: 1; overflow-y: auto; padding: 20px 20px 140px; scroll-behavior: smooth; }
 
-        /* --- CARDS (Stealth) --- */
+        /* --- CARDS --- */
         .card { 
             background: var(--surface); 
             border: 1px solid var(--border); 
@@ -94,7 +94,6 @@
         .cal-day.has-event { border: 1px solid var(--border); }
         .cal-day.has-event::after { content: ''; width: 4px; height: 4px; background: var(--text-main); border-radius: 50%; position: absolute; bottom: 4px; }
         
-        /* Calendar Pop-up */
         .day-popup {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 80%; background: #1a1a1a; border: 1px solid #444;
@@ -125,6 +124,7 @@
         .input-label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .input-field { width: 100%; background: #000; border: 1px solid var(--border); color: white; padding: 14px; border-radius: var(--radius); font-size: 0.95rem; outline: none; }
         .input-field:focus { border-color: #fff; }
+        .input-field:disabled { color: #555; border-color: #222; }
 
         .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding: 10px; background: var(--surface-2); border-radius: var(--radius); }
         .checkbox-wrapper input { width: 18px; height: 18px; accent-color: #fff; }
@@ -149,7 +149,7 @@
 
     <div id="onboarding" class="hidden">
         <h1 style="font-size: 2rem; letter-spacing: 2px; margin-bottom: 20px;">ZEN WEALTH</h1>
-        <p style="color:var(--text-muted); margin-bottom: 40px; font-size: 0.9rem;">OBSIDIAN EDITION</p>
+        <p style="color:var(--text-muted); margin-bottom: 40px; font-size: 0.9rem;">OBSIDIAN PRODUCTION</p>
         <input type="text" id="setupName" class="input-field" placeholder="YOUR NAME" style="margin-bottom: 10px; text-align: center;">
         <select id="setupCurrency" class="input-field" style="margin-bottom: 20px; text-align: center;">
             <option value="USD">USD ($)</option>
@@ -280,19 +280,41 @@
 
     <main id="view-settings" class="hidden fade-in">
         <div class="card">
-            <div class="input-group">
-                <label class="input-label">Name</label>
-                <input type="text" id="settingName" class="input-field" onchange="updateSettings()">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3 style="font-size:0.9rem;">PERSONAL PROFILE</h3>
+                <button id="btnEditProfile" class="btn-text" style="width:auto; padding:5px;" onclick="toggleProfileEdit()">EDIT</button>
             </div>
-            <div class="input-group">
-                <label class="input-label">Currency</label>
-                <select id="settingCurrency" class="input-field" onchange="updateSettings()">
-                    <option value="USD">USD ($)</option>
-                    <option value="INR">INR (₹)</option>
-                    <option value="EUR">EUR (€)</option>
-                </select>
+            <div id="profileInputs" style="opacity:0.6;">
+                <div class="input-group">
+                    <label class="input-label">Name</label>
+                    <input type="text" id="settingName" class="input-field" disabled>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Currency</label>
+                    <select id="settingCurrency" class="input-field" disabled>
+                        <option value="USD">USD ($)</option>
+                        <option value="INR">INR (₹)</option>
+                        <option value="EUR">EUR (€)</option>
+                    </select>
+                </div>
+            </div>
+            <button id="btnSaveProfile" class="btn btn-primary hidden" onclick="saveProfile()">SAVE CHANGES</button>
+        </div>
+        
+        <div class="card" style="border:1px solid var(--warning); background:rgba(255, 183, 0, 0.05);">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning); margin-top:2px;"></i>
+                <div>
+                    <h3 style="color:var(--warning); margin-bottom:5px; font-size:0.9rem;">STORAGE WARNING</h3>
+                    <p style="font-size:0.8rem; color:#ccc; line-height:1.4;">
+                        Your data is stored in this browser's memory (LocalStorage). 
+                        It will be lost if you clear cache or use Incognito mode. 
+                        <strong>Please export your data regularly.</strong>
+                    </p>
+                </div>
             </div>
         </div>
+
         <div class="card">
             <div class="item-row" onclick="exportData()">
                 <div>Export Data</div>
@@ -428,11 +450,11 @@
     const currencyMap = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
 
     function init() {
-        const stored = localStorage.getItem('zenwealth_obsidian_ult');
+        const stored = localStorage.getItem('zenwealth_obsidian_prod');
         if(stored) { db = JSON.parse(stored); document.getElementById('onboarding').classList.add('hidden'); renderAll(); } 
         else { document.getElementById('onboarding').classList.remove('hidden'); }
     }
-    function saveDB() { localStorage.setItem('zenwealth_obsidian_ult', JSON.stringify(db)); renderAll(); }
+    function saveDB() { localStorage.setItem('zenwealth_obsidian_prod', JSON.stringify(db)); renderAll(); }
     function completeOnboarding() {
         db.user.name = document.getElementById('setupName').value;
         db.user.currency = document.getElementById('setupCurrency').value;
@@ -442,6 +464,8 @@
     function renderAll() {
         const sym = currencyMap[db.user.currency];
         document.getElementById('headerGreeting').innerText = db.user.name.toUpperCase();
+        
+        // Settings Inputs (Disabled by default)
         document.getElementById('settingName').value = db.user.name;
         document.getElementById('settingCurrency').value = db.user.currency;
 
@@ -550,14 +574,31 @@
             </div>`;
         });
 
-        // Assets & Liabilities Lists (Same as before)
+        // Assets List
         const aList = document.getElementById('listAssets'); aList.innerHTML = '';
         db.assets.forEach(a => {
-            aList.innerHTML += `<div class="item-row" onclick="editAsset('asset', ${a.id})"><div style="display:flex; align-items:center;"><div class="item-icon"><i class="fa-solid fa-gem"></i></div><span style="color:#fff;">${a.name}</span></div><span class="blur-sensitive">${formatMoney(a.value)}</span></div>`;
+            aList.innerHTML += `<div class="item-row" onclick="editAsset('asset', ${a.id})">
+                <div style="display:flex; align-items:center;">
+                    <div class="item-icon"><i class="fa-solid fa-gem"></i></div>
+                    <span style="color:#fff;">${a.name}</span>
+                </div>
+                <span class="blur-sensitive">${formatMoney(a.value)}</span>
+            </div>`;
         });
+
+        // Liabilities List
         const lList = document.getElementById('listLiabilities'); lList.innerHTML = '';
         db.liabilities.forEach(l => {
-            lList.innerHTML += `<div class="item-row" onclick="editAsset('liability', ${l.id})"><div style="display:flex; align-items:center;"><div class="item-icon" style="color:var(--danger)"><i class="fa-solid fa-file-invoice"></i></div><div><div style="color:#fff;">${l.name}</div><div style="font-size:0.7rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi||0)} • ${l.rate||0}% Int</div></div></div><span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span></div>`;
+            lList.innerHTML += `<div class="item-row" onclick="editAsset('liability', ${l.id})">
+                <div style="display:flex; align-items:center;">
+                    <div class="item-icon" style="color:var(--danger)"><i class="fa-solid fa-file-invoice"></i></div>
+                    <div>
+                        <div style="color:#fff;">${l.name}</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted);">EMI: ${formatMoney(l.emi||0)} • ${l.rate||0}% Int</div>
+                    </div>
+                </div>
+                <span class="blur-sensitive" style="color:var(--danger)">-${formatMoney(l.value)}</span>
+            </div>`;
         });
     }
 
@@ -591,7 +632,56 @@
         }
     }
 
-    // --- OTHER ACTIONS (Trans, Asset, Cal) same as previous ---
+    // --- ASSET/LIABILITY ACTIONS (BUG FIXES) ---
+    function openAssetModal(type, id=null) {
+        state.editId = id;
+        document.getElementById('aType').value = type; // Fix: Ensure type is correctly set
+        document.getElementById('assetTitle').innerText = type === 'asset' ? 'ADD ASSET' : 'ADD LIABILITY';
+        document.getElementById('liabilityFields').classList.toggle('hidden', type === 'asset');
+        document.getElementById('btnDelAsset').classList.toggle('hidden', !id);
+        
+        if(id) {
+            const list = type === 'asset' ? db.assets : db.liabilities;
+            const item = list.find(x=>x.id===id);
+            document.getElementById('aName').value = item.name;
+            document.getElementById('aValue').value = item.value;
+            if(type==='liability') {
+                document.getElementById('aEmi').value = item.emi;
+                document.getElementById('aRate').value = item.rate;
+            }
+        } else {
+            document.getElementById('modalAsset').querySelectorAll('input').forEach(i=>i.value='');
+        }
+        document.getElementById('modalAsset').classList.add('active');
+    }
+
+    function saveAsset() {
+        const type = document.getElementById('aType').value;
+        const name = document.getElementById('aName').value;
+        const value = parseFloat(document.getElementById('aValue').value);
+        
+        if(name && !isNaN(value)) {
+            let item = { id: state.editId || Date.now(), name, value };
+            
+            if(type === 'liability') {
+                item.emi = parseFloat(document.getElementById('aEmi').value) || 0;
+                item.rate = parseFloat(document.getElementById('aRate').value) || 0;
+            }
+
+            const list = type === 'asset' ? db.assets : db.liabilities;
+            
+            if(state.editId) {
+                const idx = list.findIndex(x=>x.id===state.editId);
+                list[idx] = item;
+            } else {
+                list.push(item);
+            }
+            saveDB(); 
+            closeModal('modalAsset');
+        }
+    }
+
+    // --- OTHER ACTIONS ---
     let selectedDateStr = new Date().toISOString().split('T')[0];
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
@@ -627,9 +717,6 @@
     function editTransaction(id) { state.editId = id; const t = db.transactions.find(x => x.id === id); document.getElementById('modalTrans').classList.add('active'); document.getElementById('tDesc').value = t.desc; document.getElementById('tAmt').value = t.amount; document.getElementById('tDate').value = t.date; document.getElementById('tCat').value = t.cat; document.getElementById('tFixed').checked = t.isFixed || false; document.getElementById('btnDelTrans').classList.remove('hidden'); setTransType(t.type); }
     function saveTransaction() { const desc = document.getElementById('tDesc').value; const amount = parseFloat(document.getElementById('tAmt').value); const cat = document.getElementById('tCat').value; const date = document.getElementById('tDate').value; const isFixed = document.getElementById('tFixed').checked; if(desc && amount && date) { const t = { id: state.editId || Date.now(), type: state.transType, desc, amount, cat, date, isFixed }; if(state.editId) { db.transactions[db.transactions.findIndex(x=>x.id===state.editId)] = t; } else { db.transactions.push(t); } saveDB(); closeModal('modalTrans'); } }
     
-    function openAssetModal(type, id=null) { state.editId = id; document.getElementById('aType').value = type; document.getElementById('assetTitle').innerText = type === 'asset' ? 'ADD ASSET' : 'ADD LIABILITY'; document.getElementById('liabilityFields').classList.toggle('hidden', type === 'asset'); document.getElementById('btnDelAsset').classList.toggle('hidden', !id); if(id) { const item = (type === 'asset' ? db.assets : db.liabilities).find(x=>x.id===id); document.getElementById('aName').value = item.name; document.getElementById('aValue').value = item.value; if(type==='liability') { document.getElementById('aEmi').value = item.emi; document.getElementById('aRate').value = item.rate; } } else { document.getElementById('modalAsset').querySelectorAll('input').forEach(i=>i.value=''); } document.getElementById('modalAsset').classList.add('active'); }
-    function saveAsset() { const type = document.getElementById('aType').value; const name = document.getElementById('aName').value; const value = parseFloat(document.getElementById('aValue').value); if(name && value) { let item = { id: state.editId || Date.now(), name, value }; if(type === 'liability') { item.emi = parseFloat(document.getElementById('aEmi').value) || 0; item.rate = parseFloat(document.getElementById('aRate').value) || 0; } const list = type === 'asset' ? db.assets : db.liabilities; if(state.editId) { list[list.findIndex(x=>x.id===state.editId)] = item; } else { list.push(item); } saveDB(); closeModal('modalAsset'); } }
-
     function deleteItem(type) { if(!confirm("Delete item?")) return; if(type==='transaction') db.transactions = db.transactions.filter(x=>x.id!==state.editId); else if(type==='goal') db.goals = db.goals.filter(x=>x.id!==state.editId); else { db.assets = db.assets.filter(x=>x.id!==state.editId); db.liabilities = db.liabilities.filter(x=>x.id!==state.editId); } saveDB(); document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
     
     // UTILS
@@ -645,10 +732,26 @@
     function renderChart() { const ctx = document.getElementById('mainChart').getContext('2d'); if(myChart) myChart.destroy(); const labels = [], incD = [], expD = []; for(let i=5; i>=0; i--) { const d = new Date(); d.setMonth(d.getMonth() - i); labels.push(d.toLocaleString('default',{month:'short'})); const mTrans = db.transactions.filter(t => { const td = new Date(t.date); return td.getMonth()===d.getMonth() && td.getFullYear()===d.getFullYear(); }); incD.push(mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0)); expD.push(mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0)); } Chart.defaults.color = '#555'; myChart = new Chart(ctx, { type: state.chartType, data: { labels: labels, datasets: [ { label: 'Income', data: incD, backgroundColor: '#00ff9d', borderColor: '#00ff9d', tension:0.3 }, { label: 'Expense', data: expD, backgroundColor: '#ff4d4d', borderColor: '#ff4d4d', tension:0.3 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: '#222' } } }, plugins: { legend: { labels: { color: '#888' } } } } }); }
     function setChartType(t,el) { state.chartType=t; document.querySelectorAll('.chart-tab').forEach(e=>e.classList.remove('active')); el.classList.add('active'); renderChart(); }
     
-    function updateSettings() { db.user.name = document.getElementById('settingName').value; db.user.currency = document.getElementById('settingCurrency').value; saveDB(); }
-    function exportData() { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = str; a.download = 'zenwealth_obsidian.json'; a.click(); }
+    // Settings & Export
+    function toggleProfileEdit() {
+        const disabled = document.getElementById('settingName').disabled;
+        document.getElementById('settingName').disabled = !disabled;
+        document.getElementById('settingCurrency').disabled = !disabled;
+        document.getElementById('btnSaveProfile').classList.toggle('hidden', !disabled);
+        document.getElementById('btnEditProfile').innerText = disabled ? 'CANCEL' : 'EDIT';
+        document.getElementById('profileInputs').style.opacity = disabled ? '1' : '0.6';
+    }
+
+    function saveProfile() {
+        db.user.name = document.getElementById('settingName').value;
+        db.user.currency = document.getElementById('settingCurrency').value;
+        saveDB();
+        toggleProfileEdit();
+    }
+
+    function exportData() { const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); const a = document.createElement('a'); a.href = str; a.download = 'zenwealth_obsidian_prod.json'; a.click(); }
     function importData(input) { const reader = new FileReader(); reader.onload = (e) => { db = JSON.parse(e.target.result); saveDB(); alert('Restored!'); }; reader.readAsText(input.files[0]); }
-    function hardReset() { if(confirm("Permanently Delete All Data?")) { localStorage.removeItem('zenwealth_obsidian_ult'); location.reload(); } }
+    function hardReset() { if(confirm("Permanently Delete All Data?")) { localStorage.removeItem('zenwealth_obsidian_prod'); location.reload(); } }
 
     init();
 </script>
