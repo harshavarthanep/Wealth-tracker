@@ -371,10 +371,11 @@
                 </select>
             </div>
             
-            <div class="checkbox-wrapper">
+            <div class="checkbox-wrapper" id="fixedWrapper">
                 <input type="checkbox" id="tFixed">
                 <label for="tFixed" style="font-size:0.9rem; color:#fff;">Fixed Monthly? (e.g. Rent, OTT)</label>
             </div>
+            
             <div class="input-group">
                 <input type="date" id="tDate" class="input-field">
             </div>
@@ -415,7 +416,8 @@
         <div class="modal-sheet">
             <h3 style="margin-bottom:20px; text-transform:uppercase;" id="assetTitle">Add Item</h3>
             <input type="hidden" id="aId">
-            <input type="hidden" id="aType"> <div id="assetCatWrapper" class="input-group hidden">
+            
+            <div id="assetCatWrapper" class="input-group hidden">
                 <label class="input-label">Asset Class</label>
                 <select id="aCategory" class="input-field" onchange="updateAssetFields()">
                     <option value="Cash">Cash / General</option>
@@ -475,7 +477,7 @@
 
 <script>
     let db = { user: { name: '', currency: 'USD' }, transactions: [], assets: [], liabilities: [], goals: [] };
-    let state = { view: 'home', privacy: false, transType: 'expense', editId: null, calDate: new Date(), chartType: 'bar' };
+    let state = { view: 'home', privacy: false, transType: 'expense', currentAssetType: 'asset', editId: null, calDate: new Date(), chartType: 'bar' };
     const currencyMap = { 'USD': '$', 'INR': '₹', 'EUR': '€' };
 
     function init() {
@@ -642,10 +644,11 @@
     // --- ASSET/LIABILITY LOGIC ---
     function openAssetModal(type, id=null) {
         state.editId = id;
-        document.getElementById('aType').value = type;
+        state.currentAssetType = type; // STRICT STATE TRACKING
+        
         document.getElementById('assetTitle').innerText = type === 'asset' ? 'ADD ASSET' : 'ADD LIABILITY';
         
-        // Field Visibility
+        // Toggle Fields Visibility
         document.getElementById('liabilityFields').classList.toggle('hidden', type === 'asset');
         document.getElementById('assetCatWrapper').classList.toggle('hidden', type !== 'asset');
         document.getElementById('unitFields').classList.add('hidden'); // Reset
@@ -656,22 +659,25 @@
         if(id) {
             const list = type === 'asset' ? db.assets : db.liabilities;
             const item = list.find(x=>x.id===id);
-            document.getElementById('aName').value = item.name;
-            document.getElementById('aValue').value = item.value;
-            
-            if(type === 'asset') {
-                document.getElementById('aCategory').value = item.category || 'Cash';
-                if(item.category && item.category !== 'Cash') {
-                    document.getElementById('unitFields').classList.remove('hidden');
-                    document.getElementById('aQty').value = item.qty;
-                    document.getElementById('aUnitPrice').value = item.unitPrice;
-                    document.getElementById('aValue').readOnly = true;
-                    updateAssetFields(); // Refresh labels
+            if(item) {
+                document.getElementById('aName').value = item.name;
+                document.getElementById('aValue').value = item.value;
+                
+                if(type === 'asset') {
+                    document.getElementById('aCategory').value = item.category || 'Cash';
+                    if(item.category && item.category !== 'Cash') {
+                        document.getElementById('unitFields').classList.remove('hidden');
+                        document.getElementById('aQty').value = item.qty;
+                        document.getElementById('aUnitPrice').value = item.unitPrice;
+                        document.getElementById('aValue').readOnly = true;
+                        updateAssetFields(); 
+                    } else {
+                         updateAssetFields();
+                    }
+                } else {
+                    document.getElementById('aEmi').value = item.emi;
+                    document.getElementById('aRate').value = item.rate;
                 }
-            } else {
-                // Liability
-                document.getElementById('aEmi').value = item.emi;
-                document.getElementById('aRate').value = item.rate;
             }
         } else {
             // New Item
@@ -712,7 +718,8 @@
     }
 
     function saveAsset() {
-        const type = document.getElementById('aType').value;
+        // STRICTLY use state variable, not DOM input
+        const type = state.currentAssetType;
         const name = document.getElementById('aName').value;
         const value = parseFloat(document.getElementById('aValue').value);
         
@@ -735,7 +742,7 @@
             
             if(state.editId) {
                 const idx = list.findIndex(x=>x.id===state.editId);
-                list[idx] = item;
+                if(idx !== -1) list[idx] = item;
             } else {
                 list.push(item);
             }
@@ -813,7 +820,13 @@
     function deleteItem(type) { if(!confirm("Delete item?")) return; if(type==='transaction') db.transactions = db.transactions.filter(x=>x.id!==state.editId); else if(type==='goal') db.goals = db.goals.filter(x=>x.id!==state.editId); else { db.assets = db.assets.filter(x=>x.id!==state.editId); db.liabilities = db.liabilities.filter(x=>x.id!==state.editId); } saveDB(); document.querySelectorAll('.modal').forEach(m => m.classList.remove('active')); }
     
     // UTILS
-    function setTransType(t) { state.transType = t; document.getElementById('btnExp').style.background = t==='expense' ? 'var(--danger)' : 'var(--surface-2)'; document.getElementById('btnInc').style.background = t==='income' ? 'var(--success)' : 'var(--surface-2)'; }
+    function setTransType(t) { 
+        state.transType = t; 
+        document.getElementById('btnExp').style.background = t==='expense' ? 'var(--danger)' : 'var(--surface-2)'; 
+        document.getElementById('btnInc').style.background = t==='income' ? 'var(--success)' : 'var(--surface-2)';
+        // Hide Fixed Option for Income
+        document.getElementById('fixedWrapper').classList.toggle('hidden', t === 'income');
+    }
     function switchView(v) { state.view = v; document.querySelectorAll('main').forEach(m => m.classList.add('hidden')); document.getElementById(`view-${v}`).classList.remove('hidden'); document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active')); const idx = ['home','wealth','analytics','planner','settings'].indexOf(v); document.querySelectorAll('.dock-item')[idx].classList.add('active'); renderAll(); }
     function togglePrivacy() { state.privacy = !state.privacy; document.documentElement.style.setProperty('--blur', state.privacy ? '5px' : '0px'); document.getElementById('privacyToggle').classList.toggle('active', state.privacy); }
     function formatMoney(n) { return (currencyMap[db.user.currency] || '$') + n.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}); }
