@@ -142,6 +142,17 @@
         
         #onboarding { position: fixed; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; }
 
+        /* --- FOOTER CREDIT --- */
+        .footer-credit {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #333;
+            margin-top: 30px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+        
     </style>
 </head>
 <body>
@@ -325,6 +336,11 @@
             <input type="file" id="importFile" class="hidden" onchange="importData(this)">
             <div class="item-row" style="border:none; color:var(--danger);" onclick="hardReset()"><div>Reset Data</div><i class="fa-solid fa-trash"></i></div>
         </div>
+        
+        <div class="footer-credit">
+            Made with <i class="fa-solid fa-heart" style="font-size:0.6rem; color:#444;"></i> by Harsha Varthan E P
+        </div>
+
     </main>
 
     <div class="dock">
