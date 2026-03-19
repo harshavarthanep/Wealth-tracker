@@ -473,52 +473,68 @@
     // function completeOnboarding() { db.user.name = document.getElementById('setupName').value; db.user.currency = document.getElementById('setupCurrency').value; saveDB(); document.getElementById('onboarding').classList.add('hidden'); }
 
     let deferredPrompt;
-const pwaIcon = document.getElementById('pwaInstallIcon');
+    const pwaIcon = document.getElementById('pwaInstallIcon');
+    const pwaModal = document.getElementById('modalPWA');
 
-// Listen for the browser's install prompt
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    // Show the header icon if the user is already past the onboarding stage
-    if(localStorage.getItem('zenwealth_obsidian_final')) {
-        pwaIcon.classList.remove('hidden');
-    }
-});
-
-// Update your existing function
-function completeOnboarding() { 
-    db.user.name = document.getElementById('setupName').value; 
-    db.user.currency = document.getElementById('setupCurrency').value; 
-    saveDB(); 
-    document.getElementById('onboarding').classList.add('hidden'); 
-    
-    // Trigger PWA modal right after login if installation is available
-    if(deferredPrompt) {
-        document.getElementById('modalPWA').classList.add('active');
-        pwaIcon.classList.remove('hidden');
-    }
-}
-
-// Function to handle the actual installation
-async function installPWA() {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            console.log('User accepted PWA install');
-            pwaIcon.classList.add('hidden'); // Hide icon once installed
+    // Listen for the browser's install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        
+        // Check if the user is already onboarded
+        if (localStorage.getItem('zenwealth_obsidian_final')) {
+            // Show the install icon in the header
+            pwaIcon.classList.remove('hidden');
         }
-        deferredPrompt = null;
-        closeModal('modalPWA');
-    }
-}
-
-// Register the Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
     });
-}
+
+    // Update completeOnboarding to handle both saving data AND showing the PWA modal
+    function completeOnboarding() { 
+        db.user.name = document.getElementById('setupName').value; 
+        db.user.currency = document.getElementById('setupCurrency').value; 
+        saveDB(); 
+        document.getElementById('onboarding').classList.add('hidden'); 
+        
+        // Trigger PWA modal right after onboarding if installation is available
+        if(deferredPrompt) {
+            pwaModal.classList.add('active');
+            pwaIcon.classList.remove('hidden');
+        }
+    }
+
+    // Function to handle the actual installation
+    async function installPWA() {
+        if (deferredPrompt) {
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted PWA install');
+                pwaIcon.classList.add('hidden'); // Hide icon once installed
+                closeModal('modalPWA');
+            } else {
+                console.log('User dismissed PWA install');
+                closeModal('modalPWA');
+            }
+            // We've used the prompt, and can't use it again, throw it away
+            deferredPrompt = null;
+        }
+    }
+
+    // Register the Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('SW registered successfully:', registration.scope);
+                })
+                .catch(err => console.log('SW registration failed:', err));
+        });
+    }
     
     function setAvatarMood(mood) {
         const banner = document.getElementById('aiBanner');
