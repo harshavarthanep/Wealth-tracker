@@ -155,7 +155,7 @@
 
         /* Add transition to existing .fab */
         .fab {
-            transition: transform 1.3s ease, opacity 1.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         
         /* Add this new hidden state */
@@ -737,7 +737,7 @@ if ('serviceWorker' in navigator) {
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
                 fab.classList.remove('fab-hidden');
-            }, 600); 
+            }, 1200); 
         });
     });
     
