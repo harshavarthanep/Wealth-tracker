@@ -1,8 +1,10 @@
 const CACHE_NAME = 'zenwealth-cache-v1';
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json'
+  '.',
+  '.index.html',
+  '.manifest.json',
+  '.icon-192',
+  '.icon-512'
   // Add icon-192.png and icon-512.png here once you have them
 ];
 
