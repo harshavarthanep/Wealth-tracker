@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zenwealth-cache-v2'; // Bumped version to force phone to update
+const CACHE_NAME = 'zenwealth-cache-v1'; // Bumped version to force phone to update
 
 // Install Event - Bulletproof version
 self.addEventListener('install', (event) => {
