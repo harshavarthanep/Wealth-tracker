@@ -182,13 +182,18 @@
     </div>
 
     <header>
-        <div class="header-left">
-            <h1 id="headerName">ZenWealth</h1>
-            <p id="headerGreeting">WELCOME</p>
+    <div class="header-left">
+        <h1 id="headerName">ZenWealth</h1>
+        <p id="headerGreeting">WELCOME</p>
+    </div>
+    <div style="display:flex; align-items:center; gap: 15px;">
+        <div id="pwaInstallIcon" class="hidden" style="color:var(--text-main); font-size:1.1rem; cursor:pointer;" onclick="installPWA()">
+            <i class="fa-solid fa-download"></i>
         </div>
         <div class="privacy-btn" id="privacyToggle" onclick="togglePrivacy()">
             <i class="fa-solid fa-eye-slash"></i>
         </div>
+    </div>
     </header>
 
     <main id="view-home" class="fade-in">
@@ -442,7 +447,15 @@
         <div id="calPopupContent" style="max-height:200px; overflow-y:auto;"></div>
         <button class="btn btn-primary" style="margin-top:15px; padding:10px;" onclick="addTransFromCal()">+ ADD</button>
     </div>
-
+    <div class="modal" id="modalPWA">
+        <div class="modal-sheet" style="text-align:center;">
+            <h3 style="margin-bottom:10px;">Install ZenWealth</h3>
+            <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Install this app on your device for offline access and a full-screen experience.</p>
+            <button class="btn btn-primary" onclick="installPWA()">INSTALL NOW</button>
+            <button class="btn btn-text" onclick="closeModal('modalPWA')">MAYBE LATER</button>
+        </div>
+    </div>
+    
 <script>
     let db = { user: { name: '', currency: 'USD' }, transactions: [], assets: [], liabilities: [], goals: [] };
     let state = { view: 'home', privacy: false, transType: 'expense', currentAssetType: 'asset', editId: null, calDate: new Date(), chartType: 'bar' };
@@ -454,8 +467,56 @@
         else { document.getElementById('onboarding').classList.remove('hidden'); }
     }
     function saveDB() { localStorage.setItem('zenwealth_obsidian_final', JSON.stringify(db)); renderAll(); }
-    function completeOnboarding() { db.user.name = document.getElementById('setupName').value; db.user.currency = document.getElementById('setupCurrency').value; saveDB(); document.getElementById('onboarding').classList.add('hidden'); }
+    // function completeOnboarding() { db.user.name = document.getElementById('setupName').value; db.user.currency = document.getElementById('setupCurrency').value; saveDB(); document.getElementById('onboarding').classList.add('hidden'); }
 
+    let deferredPrompt;
+const pwaIcon = document.getElementById('pwaInstallIcon');
+
+// Listen for the browser's install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Show the header icon if the user is already past the onboarding stage
+    if(localStorage.getItem('zenwealth_obsidian_final')) {
+        pwaIcon.classList.remove('hidden');
+    }
+});
+
+// Update your existing function
+function completeOnboarding() { 
+    db.user.name = document.getElementById('setupName').value; 
+    db.user.currency = document.getElementById('setupCurrency').value; 
+    saveDB(); 
+    document.getElementById('onboarding').classList.add('hidden'); 
+    
+    // Trigger PWA modal right after login if installation is available
+    if(deferredPrompt) {
+        document.getElementById('modalPWA').classList.add('active');
+        pwaIcon.classList.remove('hidden');
+    }
+}
+
+// Function to handle the actual installation
+async function installPWA() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            console.log('User accepted PWA install');
+            pwaIcon.classList.add('hidden'); // Hide icon once installed
+        }
+        deferredPrompt = null;
+        closeModal('modalPWA');
+    }
+}
+
+// Register the Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+}
+    
     function setAvatarMood(mood) {
         const banner = document.getElementById('aiBanner');
         banner.className = 'ai-banner'; // Reset
