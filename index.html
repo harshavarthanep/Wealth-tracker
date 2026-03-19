@@ -707,7 +707,7 @@ if ('serviceWorker' in navigator) {
     
     function saveTransaction() { 
         const desc = document.getElementById('tDesc').value; const amount = parseFloat(document.getElementById('tAmt').value); const cat = document.getElementById('tCat').value; const date = document.getElementById('tDate').value; const isFixed = document.getElementById('tFixed').checked; 
-        if(desc && amount && date) { 
+        if(desc && !isNaN(amount) && amount > 0 && date) { 
             const t = { id: state.editId || Date.now(), type: state.transType, desc, amount, cat, date, isFixed }; 
             if(state.editId) { db.transactions[db.transactions.findIndex(x=>x.id===state.editId)] = t; } else { db.transactions.push(t); } 
             
