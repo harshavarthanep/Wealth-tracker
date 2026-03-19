@@ -680,7 +680,7 @@ if ('serviceWorker' in navigator) {
         const name = document.getElementById('aName').value;
         const value = parseFloat(document.getElementById('aValue').value);
         
-        if(name && !isNaN(value)) {
+        if(name.trim() !== '' && !isNaN(value) && value >=0) {
             let item = { id: state.editId || Date.now(), name, value };
             if(type === 'asset') {
                 item.category = document.getElementById('aCategory').value;
