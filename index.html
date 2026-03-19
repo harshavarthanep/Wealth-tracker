@@ -152,6 +152,18 @@
             letter-spacing: 0.5px;
             opacity: 0.8;
         }
+
+        /* Add transition to existing .fab */
+        .fab {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        /* Add this new hidden state */
+        .fab-hidden {
+            transform: translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+        }
         
     </style>
 </head>
@@ -651,6 +663,23 @@
     let myChart;
     function renderChart() { const ctx = document.getElementById('mainChart').getContext('2d'); if(myChart) myChart.destroy(); const labels = [], incD = [], expD = []; for(let i=5; i>=0; i--) { const d = new Date(); d.setMonth(d.getMonth() - i); labels.push(d.toLocaleString('default',{month:'short'})); const mTrans = db.transactions.filter(t => { const td = new Date(t.date); return td.getMonth()===d.getMonth() && td.getFullYear()===d.getFullYear(); }); incD.push(mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0)); expD.push(mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0)); } Chart.defaults.color = '#555'; myChart = new Chart(ctx, { type: state.chartType, data: { labels: labels, datasets: [ { label: 'Income', data: incD, backgroundColor: '#00ff9d', borderColor: '#00ff9d', tension:0.3 }, { label: 'Expense', data: expD, backgroundColor: '#ff4d4d', borderColor: '#ff4d4d', tension:0.3 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false } }, y: { grid: { color: '#222' } } }, plugins: { legend: { labels: { color: '#888' } } } } }); }
 
+    // --- FAB SCROLL LOGIC ---
+    let scrollTimeout;
+    const fab = document.querySelector('.fab');
+    
+    document.querySelectorAll('main').forEach(mainEl => {
+        mainEl.addEventListener('scroll', function() {
+            // Hide immediately when scrolling starts
+            fab.classList.add('fab-hidden');
+            
+            // Show again after 600ms of no scrolling (inactivity)
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                fab.classList.remove('fab-hidden');
+            }, 600); 
+        });
+    });
+    
     init();
 </script>
 </body>
